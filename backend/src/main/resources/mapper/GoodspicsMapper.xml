@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.GoodspicsMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.domain.Goodspics">
+            <id property="picid" column="PicID" jdbcType="INTEGER"/>
+            <result property="gid" column="GID" jdbcType="INTEGER"/>
+        <result property="picdata" column="PicData" javaType="byte[]" typeHandler="com.example.handler.BlobTypeHandler"/>
+    </resultMap>
+    <resultMap id="BlobResultMap" type="byte[]">
+        <result column="PicData" javaType="byte[]" typeHandler="com.example.handler.BlobTypeHandler"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        (PicID,GID,PicData)
+    </sql>
+    <select id="find_data" resultMap="BaseResultMap">
+        select * from GoodsPics where GID = #{gid}
+    </select>
+</mapper>

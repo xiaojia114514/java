@@ -1,0 +1,55 @@
+server:
+  port: ${SERVER_PORT:8443}
+  ssl:
+    enabled: true  # 明确启用SSL(可选，默认true当配置了ssl属性)
+    key-store: classpath:keystore.p12  # 证书文件路径
+    key-store-password: 123456  # 证书密码
+    key-store-type: PKCS12  # 证书类型
+    key-alias: tomcat  # 证书别名
+
+spring:
+  datasource:
+    url: jdbc:sqlite:random-shop.db
+    driver-class-name: org.sqlite.JDBC
+    username:
+    password:
+    mvc:
+      static-path-pattern: /static/**
+
+  session:
+    store-type: REDIS
+    redis:
+      flush-mode: on-save
+      namespace: spring:session
+      host: localhost
+      port: 6379
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.entity
+
+alipay:
+  appId: ${ALIPAY_APP_ID:2021000148613616}
+  appPrivateKey: ${ALIPAY_APP_PRIVATE_KEY:}
+  alipayPublicKey: ${ALIPAY_PUBLIC_KEY:}
+  notifyUrl: ${ALIPAY_NOTIFY_URL:http://localhost:8090/api/alipay/notify}
+  returnUrl: ${ALIPAY_RETURN_URL:http://localhost:8090/api/alipay/return}
+  gatewayUrl: ${ALIPAY_GATEWAY_URL:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+  signType: ${ALIPAY_SIGN_TYPE:RSA2}
+  charset: ${ALIPAY_CHARSET:UTF-8}
+
+pay:
+  return: ${PAY_RETURN_URL:https://localhost:8090/user-info}
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY:sk_test_default}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_default}
+  api-key: ${STRIPE_API_KEY:sk_test_default}
+  success-url: ${STRIPE_SUCCESS_URL:http://localhost:8090/success}
+  cancel-url: ${STRIPE_CANCEL_URL:http://localhost:8090/cancel}
+  price-id: ${STRIPE_PRICE_ID:your_price_id_here}
+
+
+
+
+

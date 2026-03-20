@@ -1,0 +1,92 @@
+CREATE DATABASE IF NOT EXISTS course_analysis DEFAULT CHARACTER SET utf8mb4;
+USE course_analysis;
+
+-- 用户表
+CREATE TABLE sys_user (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    real_name VARCHAR(50),
+    role VARCHAR(20) DEFAULT 'TEACHER',
+    create_time DATETIME DEFAULT NOW(),
+    update_time DATETIME DEFAULT NOW()
+);
+
+-- 操作日志表
+CREATE TABLE sys_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50),
+    operation VARCHAR(200),
+    method VARCHAR(100),
+    params TEXT,
+    create_time DATETIME DEFAULT NOW()
+);
+
+-- 课程目标表
+CREATE TABLE course_target (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(100) NOT NULL,
+    target_code VARCHAR(50) NOT NULL,
+    target_content TEXT NOT NULL,
+    weight DECIMAL(5,2) DEFAULT 1.0,
+    create_time DATETIME DEFAULT NOW()
+);
+
+-- 试卷表
+CREATE TABLE exam_paper (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    paper_name VARCHAR(100) NOT NULL,
+    course_id BIGINT,
+    total_score DECIMAL(5,2) DEFAULT 100.0,
+    create_time DATETIME DEFAULT NOW()
+);
+
+-- 双向细目表（课程目标 <-> 试题）
+CREATE TABLE target_question (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    paper_id BIGINT,
+    target_id BIGINT,
+    question_no VARCHAR(20),
+    question_score DECIMAL(5,2),
+    weight DECIMAL(5,2) DEFAULT 1.0,
+    match_type VARCHAR(20) DEFAULT 'MANUAL' -- AUTO/MANUAL
+);
+
+-- 成绩表
+CREATE TABLE student_score (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    paper_id BIGINT,
+    student_no VARCHAR(50),
+    student_name VARCHAR(50),
+    total_score DECIMAL(5,2),
+    question_scores JSON,
+    create_time DATETIME DEFAULT NOW()
+);
+
+-- 达成度计算结果表
+CREATE TABLE achievement_result (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    course_id BIGINT,
+    paper_id BIGINT,
+    target_id BIGINT,
+    target_score DECIMAL(5,2),
+    avg_score DECIMAL(5,2),
+    achievement_rate DECIMAL(5,2), -- 达成度
+    calculate_rule VARCHAR(200),
+    create_time DATETIME DEFAULT NOW()
+);
+
+-- LLM 分析报告表
+CREATE TABLE llm_report (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    course_id BIGINT,
+    paper_id BIGINT,
+    prompt TEXT,
+    report_content LONGTEXT,
+    edit_status INT DEFAULT 0, -- 0未编辑 1已编辑
+    create_time DATETIME DEFAULT NOW()
+);
+
+-- 初始化管理员
+INSERT INTO sys_user(username,password,real_name,role)
+VALUES ('admin','123456','管理员','ADMIN');

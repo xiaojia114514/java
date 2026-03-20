@@ -1,0 +1,61 @@
+{
+  "order": {
+    "orderId": "Order ID",
+    "productId": "Product ID",
+    "productName": "Product Name",
+    "userAccount": "User Account",
+    "quantity": "Quantity",
+    "phone": "Phone",
+    "address": "Address",
+    "remark": "Remark",
+    "status": "Status",
+    "logistics": "Logistics",
+    "operations": "Operations",
+    "statuses": {
+      "unpaid": "Unpaid",
+      "paid": "Paid",
+      "preparing": "Preparing",
+      "shipping": "Shipping",
+      "completed": "Completed"
+    },
+    "actions": {
+      "prepare": "Prepare",
+      "ship": "Ship",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "selectLogistics": "Select Logistics",
+      "confirm": "Confirm",
+      "cancelAction": "Cancel",
+      "return": "Return",
+      "loading": "Loading..."
+    },
+    "messages": {
+      "selectLogisticsCompany": "Select Logistics Company",
+      "pleaseSelectLogistics": "Please select logistics",
+      "confirmLogistics": "Confirm logistics company?",
+      "logisticsUpdated": "Logistics information updated",
+      "orderCancelled": "Order cancelled",
+      "stockPreparing": "Paid, preparing",
+      "readyToShip": "Preparation completed, ready to ship",
+      "shipped": "Shipped, waiting for receipt",
+      "completed": "Received, order completed",
+      "insufficientStock": "Insufficient stock",
+      "unpaidCannotPrepare": "Order unpaid, cannot prepare",
+      "noLogisticsSelected": "No logistics selected, cannot prepare",
+      "operationFailed": "Operation failed, please try again later",
+      "fetchOrdersFailed": "Failed to fetch orders",
+      "fetchLogisticsFailed": "Failed to fetch logistics list"
+    },
+    "category": {
+      "all": "All"
+    },
+    "product": {
+      "stock": "Stock",
+      "unit": ""
+    },
+    "search": {
+      "placeholder": "Search products...",
+      "button": "Search"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.domain.Order">
+            <id property="oid" column="OID" jdbcType="INTEGER"/>
+            <result property="gid" column="GID" jdbcType="INTEGER"/>
+            <result property="uaccount" column="UAccount" jdbcType="VARCHAR"/>
+            <result property="ophone" column="OPhone" jdbcType="VARCHAR"/>
+            <result property="oaddress" column="OAddress" jdbcType="VARCHAR"/>
+            <result property="onumber" column="ONumber" jdbcType="INTEGER"/>
+            <result property="eid" column="EID" jdbcType="INTEGER"/>
+            <result property="oremark" column="ORemark" jdbcType="VARCHAR"/>
+            <result property="ostate" column="OState" jdbcType="INTEGER"/>
+            <result property="opaid" column="OPaid" jdbcType="INTEGER"/>
+    </resultMap>
+    <insert id="creat">
+        insert into "Order" (gid,uaccount,ophone, oaddress, onumber,eid,oremark, ostate,opaid) values (#{gid},#{uaccount},#{ophone},#{oaddress},#{onumber},#{eid},#{oremark},#{ostate},#{opaid})
+    </insert>
+    <update id="update_oinfo">
+        update "Order" set OPhone = #{phone},OAddress = #{address},ORemark = #{remark} where OID = #{id}
+    </update>
+    <update id="update_ostate">
+        update "Order" set OState = #{state} where OID = #{id}
+    </update>
+
+    <select id="list_Order" resultType="com.example.domain.Order">
+        select * from "Order"
+    </select>
+    <select id="get_History_By_Account" resultType="com.example.domain.Order">
+        select * from "Order" where UAccount = #{account}
+    </select>
+    <select id="get_History_By_Account_And_State" resultType="com.example.domain.Order">
+        select * from "Order" where UAccount = #{account} and OState = #{state}
+    </select>
+    <select id="get_by_oid" resultType="com.example.domain.Order">
+        select * from "Order" where oid = #{id}
+    </select>
+</mapper>

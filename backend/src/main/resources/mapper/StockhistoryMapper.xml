@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.StockhistoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.domain.Stockhistory">
+            <id property="SHID" column="SHID" jdbcType="INTEGER"/>
+            <result property="SHTime" column="SHTime" jdbcType="DATE"/>
+            <result property="SHReason" column="SHReason" jdbcType="INTEGER"/>
+            <result property="GID" column="GID" jdbcType="INTEGER"/>
+            <result property="SHStock_O" column="SHStock_O" jdbcType="INTEGER"/>
+            <result property="SHStock_N" column="SHStock_N" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        SHID,SHTime,SHReason,
+        GID,SHStock_O,SHStock_N
+    </sql>
+</mapper>

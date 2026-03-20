@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.AftersaleMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.domain.Aftersale">
+            <id property="afid" column="AfID" jdbcType="INTEGER"/>
+            <result property="oid" column="OID" jdbcType="INTEGER"/>
+            <result property="afname" column="AfName" jdbcType="VARCHAR"/>
+            <result property="aftext" column="AfText" jdbcType="VARCHAR"/>
+            <result property="afstate" column="AfState" jdbcType="INTEGER"/>
+            <result property="aftime" column="AfTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        AfID,OID,AfName,
+        AfText,AfState,AfTime
+    </sql>
+</mapper>
