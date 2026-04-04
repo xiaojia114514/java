@@ -32,6 +32,9 @@ public class SysNotice extends BaseEntity
     /** 公告状态（0正常 1关闭） */
     private String status;
 
+    /** 通知重要程度（high重要 medium一般 normal普通） */
+    private String noticeLevel;
+
     /** 是否已读 */
     @JsonProperty("isRead")
     private boolean isRead;
@@ -89,6 +92,16 @@ public class SysNotice extends BaseEntity
         return status;
     }
 
+    public void setNoticeLevel(String noticeLevel)
+    {
+        this.noticeLevel = noticeLevel;
+    }
+
+    public String getNoticeLevel()
+    {
+        return noticeLevel;
+    }
+
     public boolean getIsRead()
     {
         return isRead;
@@ -107,6 +120,7 @@ public class SysNotice extends BaseEntity
             .append("noticeType", getNoticeType())
             .append("noticeContent", getNoticeContent())
             .append("status", getStatus())
+            .append("noticeLevel", getNoticeLevel())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

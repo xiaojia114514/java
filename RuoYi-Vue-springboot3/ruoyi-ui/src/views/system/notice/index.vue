@@ -27,6 +27,13 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item label="重要程度" prop="noticeLevel">
+        <el-select v-model="queryParams.noticeLevel" placeholder="重要程度" clearable>
+          <el-option label="重要" value="high" />
+          <el-option label="一般" value="medium" />
+          <el-option label="普通" value="normal" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -81,6 +88,14 @@
       <el-table-column label="公告类型" align="center" prop="noticeType" width="100">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_notice_type" :value="scope.row.noticeType"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="重要程度" align="center" prop="noticeLevel" width="100">
+        <template slot-scope="scope">
+          <el-tag :type="getNoticeTagType(scope.row.noticeLevel)" size="small">
+            <i :class="getNoticeIcon(scope.row.noticeLevel)" style="margin-right: 4px;"></i>
+            {{ getNoticeLevelText(scope.row.noticeLevel) }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status" width="100">
@@ -143,7 +158,22 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="24">
+          <el-col :span="12">
+            <el-form-item label="重要程度" prop="noticeLevel">
+              <el-select v-model="form.noticeLevel" placeholder="请选择重要程度">
+                <el-option label="重要" value="high">
+                  <span style="float: left"><i class="el-icon-warning" style="color: #F56C6C; margin-right: 8px;"></i>重要</span>
+                </el-option>
+                <el-option label="一般" value="medium">
+                  <span style="float: left"><i class="el-icon-info" style="color: #E6A23C; margin-right: 8px;"></i>一般</span>
+                </el-option>
+                <el-option label="普通" value="normal">
+                  <span style="float: left"><i class="el-icon-bell" style="color: #409EFF; margin-right: 8px;"></i>普通</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="状态">
               <el-radio-group v-model="form.status">
                 <el-radio
@@ -177,35 +207,24 @@ export default {
   dicts: ['sys_notice_status', 'sys_notice_type'],
   data() {
     return {
-      // 遮罩层
       loading: true,
-      // 选中数组
       ids: [],
-      // 非单个禁用
       single: true,
-      // 非多个禁用
       multiple: true,
-      // 显示搜索条件
       showSearch: true,
-      // 总条数
       total: 0,
-      // 公告表格数据
       noticeList: [],
-      // 弹出层标题
       title: "",
-      // 是否显示弹出层
       open: false,
-      // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         noticeTitle: undefined,
         createBy: undefined,
-        status: undefined
+        status: undefined,
+        noticeLevel: undefined
       },
-      // 表单参数
       form: {},
-      // 表单校验
       rules: {
         noticeTitle: [
           { required: true, message: "公告标题不能为空", trigger: "blur" }
@@ -220,7 +239,6 @@ export default {
     this.getList()
   },
   methods: {
-    /** 查询公告列表 */
     getList() {
       this.loading = true
       listNotice(this.queryParams).then(response => {
@@ -229,45 +247,39 @@ export default {
         this.loading = false
       })
     },
-    // 取消按钮
     cancel() {
       this.open = false
       this.reset()
     },
-    // 表单重置
     reset() {
       this.form = {
         noticeId: undefined,
         noticeTitle: undefined,
         noticeType: undefined,
         noticeContent: undefined,
+        noticeLevel: 'normal',
         status: "0"
       }
       this.resetForm("form")
     },
-    /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
     },
-    /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm")
       this.handleQuery()
     },
-    // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.noticeId)
       this.single = selection.length!=1
       this.multiple = !selection.length
     },
-    /** 新增按钮操作 */
     handleAdd() {
       this.reset()
       this.open = true
       this.title = "添加公告"
     },
-    /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
       const noticeId = row.noticeId || this.ids
@@ -277,7 +289,6 @@ export default {
         this.title = "修改公告"
       })
     },
-    /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -297,7 +308,6 @@ export default {
         }
       })
     },
-    /** 删除按钮操作 */
     handleDelete(row) {
       const noticeIds = row.noticeId || this.ids
       this.$modal.confirm('是否确认删除公告编号为"' + noticeIds + '"的数据项？').then(function() {
@@ -306,6 +316,30 @@ export default {
         this.getList()
         this.$modal.msgSuccess("删除成功")
       }).catch(() => {})
+    },
+    getNoticeIcon(level) {
+      const icons = {
+        'high': 'el-icon-warning',
+        'medium': 'el-icon-info',
+        'normal': 'el-icon-bell'
+      }
+      return icons[level] || icons['normal']
+    },
+    getNoticeTagType(level) {
+      const types = {
+        'high': 'danger',
+        'medium': 'warning',
+        'normal': 'info'
+      }
+      return types[level] || types['normal']
+    },
+    getNoticeLevelText(level) {
+      const texts = {
+        'high': '重要',
+        'medium': '一般',
+        'normal': '普通'
+      }
+      return texts[level] || texts['normal']
     }
   }
 }
