@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ConnectException;
+import java.net.URI;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -71,7 +72,7 @@ public class HttpUtils
         {
             String urlNameString = StringUtils.isNotBlank(param) ? url + "?" + param : url;
             log.info("sendGet - {}", urlNameString);
-            URL realUrl = new URL(urlNameString);
+            URL realUrl = new URI(urlNameString).toURL();
             URLConnection connection = realUrl.openConnection();
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
@@ -146,7 +147,7 @@ public class HttpUtils
         try
         {
             log.info("sendPost - {}", url);
-            URL realUrl = new URL(url);
+            URL realUrl = new URI(url).toURL();
             URLConnection conn = realUrl.openConnection();
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
@@ -217,7 +218,7 @@ public class HttpUtils
             log.info("sendSSLPost - {}", urlNameString);
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, new TrustManager[] { new TrustAnyTrustManager() }, new java.security.SecureRandom());
-            URL console = new URL(urlNameString);
+            URL console = new URI(urlNameString).toURL();
             HttpsURLConnection conn = (HttpsURLConnection) console.openConnection();
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
