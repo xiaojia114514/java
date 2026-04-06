@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.score.mapper.ExamScoreMapper">
+    
+    <resultMap type="ExamScore" id="ExamScoreResult">
+        <result property="scoreId"    column="score_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="scoreFile"    column="score_file"    />
+        <result property="scoreSize"    column="score_size"    />
+        <result property="examDate"    column="exam_date"    />
+        <result property="totalStudents"    column="total_students"    />
+        <result property="averageScore"    column="average_score"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectExamScoreVo">
+        select score_id, course_id, score_file, score_size, exam_date, total_students, average_score, status, create_by, create_time, update_by, update_time, remark from exam_score
+    </sql>
+
+    <select id="selectExamScoreList" parameterType="ExamScore" resultMap="ExamScoreResult">
+        <include refid="selectExamScoreVo"/>
+        <where>  
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="scoreFile != null  and scoreFile != ''"> and score_file = #{scoreFile}</if>
+            <if test="scoreSize != null "> and score_size = #{scoreSize}</if>
+            <if test="examDate != null "> and exam_date = #{examDate}</if>
+            <if test="totalStudents != null "> and total_students = #{totalStudents}</if>
+            <if test="averageScore != null "> and average_score = #{averageScore}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectExamScoreByScoreId" parameterType="Long" resultMap="ExamScoreResult">
+        <include refid="selectExamScoreVo"/>
+        where score_id = #{scoreId}
+    </select>
+
+    <insert id="insertExamScore" parameterType="ExamScore" useGeneratedKeys="true" keyProperty="scoreId">
+        insert into exam_score
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="scoreFile != null and scoreFile != ''">score_file,</if>
+            <if test="scoreSize != null">score_size,</if>
+            <if test="examDate != null">exam_date,</if>
+            <if test="totalStudents != null">total_students,</if>
+            <if test="averageScore != null">average_score,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="scoreFile != null and scoreFile != ''">#{scoreFile},</if>
+            <if test="scoreSize != null">#{scoreSize},</if>
+            <if test="examDate != null">#{examDate},</if>
+            <if test="totalStudents != null">#{totalStudents},</if>
+            <if test="averageScore != null">#{averageScore},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateExamScore" parameterType="ExamScore">
+        update exam_score
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="scoreFile != null and scoreFile != ''">score_file = #{scoreFile},</if>
+            <if test="scoreSize != null">score_size = #{scoreSize},</if>
+            <if test="examDate != null">exam_date = #{examDate},</if>
+            <if test="totalStudents != null">total_students = #{totalStudents},</if>
+            <if test="averageScore != null">average_score = #{averageScore},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where score_id = #{scoreId}
+    </update>
+
+    <delete id="deleteExamScoreByScoreId" parameterType="Long">
+        delete from exam_score where score_id = #{scoreId}
+    </delete>
+
+    <delete id="deleteExamScoreByScoreIds" parameterType="String">
+        delete from exam_score where score_id in 
+        <foreach item="scoreId" collection="array" open="(" separator="," close=")">
+            #{scoreId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.syllabus.mapper.SyllabusMapper">
+    
+    <resultMap type="Syllabus" id="SyllabusResult">
+        <result property="syllabusId"    column="syllabus_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="syllabusName"    column="syllabus_name"    />
+        <result property="syllabusFile"    column="syllabus_file"    />
+        <result property="syllabusSize"    column="syllabus_size"    />
+        <result property="syllabusVersion"    column="syllabus_version"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSyllabusVo">
+        select syllabus_id, course_id, syllabus_name, syllabus_file, syllabus_size, syllabus_version, status, create_by, create_time, update_by, update_time, remark from syllabus
+    </sql>
+
+    <select id="selectSyllabusList" parameterType="Syllabus" resultMap="SyllabusResult">
+        <include refid="selectSyllabusVo"/>
+        <where>  
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="syllabusName != null  and syllabusName != ''"> and syllabus_name like concat('%', #{syllabusName}, '%')</if>
+            <if test="syllabusFile != null  and syllabusFile != ''"> and syllabus_file = #{syllabusFile}</if>
+            <if test="syllabusSize != null "> and syllabus_size = #{syllabusSize}</if>
+            <if test="syllabusVersion != null  and syllabusVersion != ''"> and syllabus_version = #{syllabusVersion}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectSyllabusBySyllabusId" parameterType="Long" resultMap="SyllabusResult">
+        <include refid="selectSyllabusVo"/>
+        where syllabus_id = #{syllabusId}
+    </select>
+
+    <insert id="insertSyllabus" parameterType="Syllabus" useGeneratedKeys="true" keyProperty="syllabusId">
+        insert into syllabus
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="syllabusName != null and syllabusName != ''">syllabus_name,</if>
+            <if test="syllabusFile != null and syllabusFile != ''">syllabus_file,</if>
+            <if test="syllabusSize != null">syllabus_size,</if>
+            <if test="syllabusVersion != null">syllabus_version,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="syllabusName != null and syllabusName != ''">#{syllabusName},</if>
+            <if test="syllabusFile != null and syllabusFile != ''">#{syllabusFile},</if>
+            <if test="syllabusSize != null">#{syllabusSize},</if>
+            <if test="syllabusVersion != null">#{syllabusVersion},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSyllabus" parameterType="Syllabus">
+        update syllabus
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="syllabusName != null and syllabusName != ''">syllabus_name = #{syllabusName},</if>
+            <if test="syllabusFile != null and syllabusFile != ''">syllabus_file = #{syllabusFile},</if>
+            <if test="syllabusSize != null">syllabus_size = #{syllabusSize},</if>
+            <if test="syllabusVersion != null">syllabus_version = #{syllabusVersion},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where syllabus_id = #{syllabusId}
+    </update>
+
+    <delete id="deleteSyllabusBySyllabusId" parameterType="Long">
+        delete from syllabus where syllabus_id = #{syllabusId}
+    </delete>
+
+    <delete id="deleteSyllabusBySyllabusIds" parameterType="String">
+        delete from syllabus where syllabus_id in 
+        <foreach item="syllabusId" collection="array" open="(" separator="," close=")">
+            #{syllabusId}
+        </foreach>
+    </delete>
+</mapper>

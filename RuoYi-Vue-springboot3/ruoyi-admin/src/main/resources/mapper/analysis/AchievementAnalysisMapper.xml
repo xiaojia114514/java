@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.analysis.mapper.AchievementAnalysisMapper">
+    
+    <resultMap type="AchievementAnalysis" id="AchievementAnalysisResult">
+        <result property="analysisId"    column="analysis_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="syllabusId"    column="syllabus_id"    />
+        <result property="reviewId"    column="review_id"    />
+        <result property="scoreId"    column="score_id"    />
+        <result property="analysisDate"    column="analysis_date"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectAchievementAnalysisVo">
+        select analysis_id, course_id, syllabus_id, review_id, score_id, analysis_date, status, create_by, create_time, update_by, update_time, remark from achievement_analysis
+    </sql>
+
+    <select id="selectAchievementAnalysisList" parameterType="AchievementAnalysis" resultMap="AchievementAnalysisResult">
+        <include refid="selectAchievementAnalysisVo"/>
+        <where>  
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="syllabusId != null "> and syllabus_id = #{syllabusId}</if>
+            <if test="reviewId != null "> and review_id = #{reviewId}</if>
+            <if test="scoreId != null "> and score_id = #{scoreId}</if>
+            <if test="analysisDate != null "> and analysis_date = #{analysisDate}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectAchievementAnalysisByAnalysisId" parameterType="Long" resultMap="AchievementAnalysisResult">
+        <include refid="selectAchievementAnalysisVo"/>
+        where analysis_id = #{analysisId}
+    </select>
+
+    <insert id="insertAchievementAnalysis" parameterType="AchievementAnalysis" useGeneratedKeys="true" keyProperty="analysisId">
+        insert into achievement_analysis
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="syllabusId != null">syllabus_id,</if>
+            <if test="reviewId != null">review_id,</if>
+            <if test="scoreId != null">score_id,</if>
+            <if test="analysisDate != null">analysis_date,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="syllabusId != null">#{syllabusId},</if>
+            <if test="reviewId != null">#{reviewId},</if>
+            <if test="scoreId != null">#{scoreId},</if>
+            <if test="analysisDate != null">#{analysisDate},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAchievementAnalysis" parameterType="AchievementAnalysis">
+        update achievement_analysis
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="syllabusId != null">syllabus_id = #{syllabusId},</if>
+            <if test="reviewId != null">review_id = #{reviewId},</if>
+            <if test="scoreId != null">score_id = #{scoreId},</if>
+            <if test="analysisDate != null">analysis_date = #{analysisDate},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where analysis_id = #{analysisId}
+    </update>
+
+    <delete id="deleteAchievementAnalysisByAnalysisId" parameterType="Long">
+        delete from achievement_analysis where analysis_id = #{analysisId}
+    </delete>
+
+    <delete id="deleteAchievementAnalysisByAnalysisIds" parameterType="String">
+        delete from achievement_analysis where analysis_id in 
+        <foreach item="analysisId" collection="array" open="(" separator="," close=")">
+            #{analysisId}
+        </foreach>
+    </delete>
+</mapper>

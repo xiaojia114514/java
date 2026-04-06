@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.score.mapper.StudentScoreMapper">
+    
+    <resultMap type="StudentScore" id="StudentScoreResult">
+        <result property="studentScoreId"    column="student_score_id"    />
+        <result property="scoreId"    column="score_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="studentName"    column="student_name"    />
+        <result property="totalScore"    column="total_score"    />
+        <result property="scoreDetails"    column="score_details"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectStudentScoreVo">
+        select student_score_id, score_id, course_id, student_id, student_name, total_score, score_details, status, create_time, update_time from student_score
+    </sql>
+
+    <select id="selectStudentScoreList" parameterType="StudentScore" resultMap="StudentScoreResult">
+        <include refid="selectStudentScoreVo"/>
+        <where>  
+            <if test="scoreId != null "> and score_id = #{scoreId}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="studentId != null  and studentId != ''"> and student_id = #{studentId}</if>
+            <if test="studentName != null  and studentName != ''"> and student_name like concat('%', #{studentName}, '%')</if>
+            <if test="totalScore != null "> and total_score = #{totalScore}</if>
+            <if test="scoreDetails != null  and scoreDetails != ''"> and score_details = #{scoreDetails}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectStudentScoreByStudentScoreId" parameterType="Long" resultMap="StudentScoreResult">
+        <include refid="selectStudentScoreVo"/>
+        where student_score_id = #{studentScoreId}
+    </select>
+
+    <insert id="insertStudentScore" parameterType="StudentScore" useGeneratedKeys="true" keyProperty="studentScoreId">
+        insert into student_score
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scoreId != null">score_id,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="studentId != null and studentId != ''">student_id,</if>
+            <if test="studentName != null and studentName != ''">student_name,</if>
+            <if test="totalScore != null">total_score,</if>
+            <if test="scoreDetails != null">score_details,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scoreId != null">#{scoreId},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="studentId != null and studentId != ''">#{studentId},</if>
+            <if test="studentName != null and studentName != ''">#{studentName},</if>
+            <if test="totalScore != null">#{totalScore},</if>
+            <if test="scoreDetails != null">#{scoreDetails},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStudentScore" parameterType="StudentScore">
+        update student_score
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scoreId != null">score_id = #{scoreId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="studentId != null and studentId != ''">student_id = #{studentId},</if>
+            <if test="studentName != null and studentName != ''">student_name = #{studentName},</if>
+            <if test="totalScore != null">total_score = #{totalScore},</if>
+            <if test="scoreDetails != null">score_details = #{scoreDetails},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where student_score_id = #{studentScoreId}
+    </update>
+
+    <delete id="deleteStudentScoreByStudentScoreId" parameterType="Long">
+        delete from student_score where student_score_id = #{studentScoreId}
+    </delete>
+
+    <delete id="deleteStudentScoreByStudentScoreIds" parameterType="String">
+        delete from student_score where student_score_id in 
+        <foreach item="studentScoreId" collection="array" open="(" separator="," close=")">
+            #{studentScoreId}
+        </foreach>
+    </delete>
+</mapper>
