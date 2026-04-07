@@ -116,6 +116,12 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['syllabus:syllabus:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-download"
+            @click="handleDownload(scope.row)"
+          >下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -167,6 +173,7 @@
 
 <script>
 import { listSyllabus, getSyllabus, delSyllabus, addSyllabus, updateSyllabus } from "@/api/syllabus/syllabus"
+import download from '@/plugins/download'
 import { listCourse } from "@/api/course/course"
 
 export default {
@@ -316,6 +323,13 @@ export default {
     resetQuery() {
       this.resetForm("queryForm")
       this.handleQuery()
+    },
+    /** 下载文件 */
+    handleDownload(row) {
+      if (row.syllabusFile) {
+        // 下载文件，使用download插件
+        download.resource(row.syllabusFile)
+      }
     },
     // 多选框选中数据
     handleSelectionChange(selection) {

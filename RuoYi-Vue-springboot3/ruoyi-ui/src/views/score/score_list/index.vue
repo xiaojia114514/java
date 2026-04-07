@@ -143,6 +143,12 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['score:score_list:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-download"
+            @click="handleDownload(scope.row)"
+          >下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -208,6 +214,7 @@
 <script>
 import { listScore_list, getScore_list, delScore_list, addScore_list, updateScore_list } from "@/api/score/score_list"
 import { listCourse } from "@/api/course/course"
+import download from '@/plugins/download'
 
 export default {
   name: "Score_list",
@@ -353,6 +360,13 @@ export default {
     resetQuery() {
       this.resetForm("queryForm")
       this.handleQuery()
+    },
+    /** 下载文件 */
+    handleDownload(row) {
+      if (row.scoreFile) {
+        // 下载文件，使用download插件
+        download.resource(row.scoreFile)
+      }
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
