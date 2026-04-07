@@ -189,7 +189,7 @@ export default {
     // 上传成功回调
     handleUploadSuccess(res, file) {
       if (res.code === 200) {
-        this.uploadList.push({ name: res.fileName, url: res.fileName })
+        this.uploadList.push({ name: res.fileName, url: res.fileName, size: file.size })
         this.uploadedSuccessfully()
       } else {
         this.number--
@@ -208,9 +208,12 @@ export default {
     uploadedSuccessfully() {
       if (this.number > 0 && this.uploadList.length === this.number) {
         this.fileList = this.fileList.concat(this.uploadList)
+        const filePaths = this.listToString(this.fileList)
+        const totalSize = this.fileList.reduce((sum, file) => sum + (file.size || 0), 0)
         this.uploadList = []
         this.number = 0
-        this.$emit("input", this.listToString(this.fileList))
+        this.$emit("input", filePaths)
+        this.$emit("change", { paths: filePaths, size: totalSize })
         this.$modal.closeLoading()
       }
     },

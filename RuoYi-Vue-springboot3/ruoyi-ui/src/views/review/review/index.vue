@@ -88,16 +88,35 @@
     <el-table v-loading="loading" :data="reviewList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="审查ID" align="center" prop="reviewId" />
-      <el-table-column label="课程ID" align="center" prop="courseId" />
+      <el-table-column label="课程代码" align="center">
+        <template slot-scope="scope">
+          {{ getCourseCode(scope.row.courseId) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="课程名称" align="center">
+        <template slot-scope="scope">
+          {{ getCourseName(scope.row.courseId) }}
+        </template>
+      </el-table-column>
       <el-table-column label="试卷名称" align="center" prop="paperName" />
       <el-table-column label="文件路径" align="center" prop="reviewFile" />
-      <el-table-column label="文件大小" align="center" prop="reviewSize" />
+      <el-table-column label="文件大小" align="center">
+        <template slot-scope="scope">
+          {{ formatFileSize(scope.row.reviewSize) }}
+        </template>
+      </el-table-column>
       <el-table-column label="审查日期" align="center" prop="reviewDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.reviewDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column label="状态" align="center">
+        <template slot-scope="scope">
+          <span v-if="scope.row.status === '0'">正常</span>
+          <span v-else-if="scope.row.status === '1'">停用</span>
+          <span v-else>{{ scope.row.status }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -130,17 +149,24 @@
     <!-- 添加或修改试卷实质审查对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程ID" prop="courseId">
-          <el-input v-model="form.courseId" placeholder="请输入课程ID" />
+        <el-form-item label="课程信息" prop="courseId">
+          <el-select v-model="form.courseId" placeholder="请选择课程" style="width: 100%">
+            <el-option
+              v-for="course in courseList"
+              :key="course.courseId"
+              :label="course.courseCode + ' - ' + course.courseName"
+              :value="course.courseId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="试卷名称" prop="paperName">
           <el-input v-model="form.paperName" placeholder="请输入试卷名称" />
         </el-form-item>
         <el-form-item label="文件路径" prop="reviewFile">
-          <file-upload v-model="form.reviewFile"/>
+          <file-upload v-model="form.reviewFile" @change="handleFileChange"/>
         </el-form-item>
         <el-form-item label="文件大小" prop="reviewSize">
-          <el-input v-model="form.reviewSize" placeholder="请输入文件大小" />
+          <el-input :value="formatFileSize(form.reviewSize)" placeholder="请输入文件大小" disabled />
         </el-form-item>
         <el-form-item label="审查日期" prop="reviewDate">
           <el-date-picker clearable
@@ -149,6 +175,11 @@
             value-format="yyyy-MM-dd"
             placeholder="请选择审查日期">
           </el-date-picker>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="form.status">
+            <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -164,9 +195,11 @@
 
 <script>
 import { listReview, getReview, delReview, addReview, updateReview } from "@/api/review/review"
+import { listCourse } from "@/api/course/course"
 
 export default {
   name: "Review",
+  dicts: ['sys_normal_disable'],
   data() {
     return {
       // 遮罩层
@@ -183,6 +216,10 @@ export default {
       total: 0,
       // 试卷实质审查表格数据
       reviewList: [],
+      // 课程列表
+      courseList: [],
+      // 课程信息映射
+      courseMap: {},
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -202,9 +239,6 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        courseId: [
-          { required: true, message: "课程ID不能为空", trigger: "blur" }
-        ],
         paperName: [
           { required: true, message: "试卷名称不能为空", trigger: "blur" }
         ],
@@ -216,6 +250,7 @@ export default {
   },
   created() {
     this.getList()
+    this.getCourseList()
   },
   methods: {
     /** 查询试卷实质审查列表 */
@@ -226,6 +261,57 @@ export default {
         this.total = response.total
         this.loading = false
       })
+    },
+    /** 查询课程列表 */
+    getCourseList() {
+      listCourse({ pageNum: 1, pageSize: 1000 }).then(response => {
+        this.courseList = response.rows
+        // 构建课程信息映射
+        this.courseMap = {}
+        response.rows.forEach(course => {
+          this.courseMap[course.courseId] = course.courseCode + ' - ' + course.courseName
+        })
+      })
+    },
+    /** 获取课程代码 */
+    getCourseCode(courseId) {
+      const course = this.courseList.find(c => c.courseId === courseId)
+      return course ? course.courseCode : courseId
+    },
+    /** 获取课程名称 */
+    getCourseName(courseId) {
+      const course = this.courseList.find(c => c.courseId === courseId)
+      return course ? course.courseName : courseId
+    },
+    /** 处理文件选择变化 */
+    handleFileChange(fileInfo) {
+      if (fileInfo) {
+        let filePaths = fileInfo
+        let fileSize = 0
+        
+        // 处理传递的对象格式
+        if (typeof fileInfo === 'object') {
+          filePaths = fileInfo.paths
+          fileSize = fileInfo.size
+        }
+        
+        // 从文件路径中提取文件名
+        const fileName = filePaths.split('/').pop()
+        // 自动填充试卷名称（如果需要）
+        if (!this.form.paperName) {
+          this.form.paperName = fileName
+        }
+        // 填充文件大小（存储原始字节值）
+        this.form.reviewSize = fileSize
+      }
+    },
+    /** 格式化文件大小 */
+    formatFileSize(bytes) {
+      if (bytes === 0) return '0 B'
+      const k = 1024
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
     // 取消按钮
     cancel() {

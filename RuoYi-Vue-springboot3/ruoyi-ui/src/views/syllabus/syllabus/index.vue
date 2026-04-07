@@ -210,9 +210,6 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        courseId: [
-          { required: true, message: "课程不能为空", trigger: "blur" }
-        ],
         syllabusName: [
           { required: true, message: "大纲名称不能为空", trigger: "blur" }
         ],
