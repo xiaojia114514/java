@@ -174,9 +174,7 @@
         <el-form-item label="授课班级" prop="className">
           <el-input v-model="form.className" placeholder="请输入授课班级" />
         </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-        </el-form-item>
+
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -272,7 +270,6 @@ export default {
         semester: null,
         className: null,
         status: null,
-        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,

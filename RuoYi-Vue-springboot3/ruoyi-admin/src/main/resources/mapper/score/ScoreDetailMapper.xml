@@ -24,6 +24,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectScoreDetailList" parameterType="ScoreDetail" resultMap="ScoreDetailResult">
         <include refid="selectScoreDetailVo"/>
         <where>  
+            del_flag = '0'
             <if test="scoreId != null "> and score_id = #{scoreId}</if>
             <if test="courseId != null "> and course_id = #{courseId}</if>
             <if test="detailName != null  and detailName != ''"> and detail_name like concat('%', #{detailName}, '%')</if>
@@ -35,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectScoreDetailByScoreDetailId" parameterType="Long" resultMap="ScoreDetailResult">
         <include refid="selectScoreDetailVo"/>
-        where score_detail_id = #{scoreDetailId}
+        where score_detail_id = #{scoreDetailId} and del_flag = '0'
     </select>
 
     <insert id="insertScoreDetail" parameterType="ScoreDetail" useGeneratedKeys="true" keyProperty="scoreDetailId">

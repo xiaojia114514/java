@@ -26,6 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectSyllabusList" parameterType="Syllabus" resultMap="SyllabusResult">
         <include refid="selectSyllabusVo"/>
         <where>  
+            del_flag = '0'
             <if test="courseId != null "> and course_id = #{courseId}</if>
             <if test="syllabusName != null  and syllabusName != ''"> and syllabus_name like concat('%', #{syllabusName}, '%')</if>
             <if test="syllabusFile != null  and syllabusFile != ''"> and syllabus_file = #{syllabusFile}</if>
@@ -36,7 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectSyllabusBySyllabusId" parameterType="Long" resultMap="SyllabusResult">
         <include refid="selectSyllabusVo"/>
-        where syllabus_id = #{syllabusId}
+        where syllabus_id = #{syllabusId} and del_flag = '0'
     </select>
 
     <insert id="insertSyllabus" parameterType="Syllabus" useGeneratedKeys="true" keyProperty="syllabusId">

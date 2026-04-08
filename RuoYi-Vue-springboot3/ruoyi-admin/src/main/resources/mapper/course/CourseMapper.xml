@@ -30,6 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectCourseList" parameterType="Course" resultMap="CourseResult">
         <include refid="selectCourseVo"/>
         <where>  
+            del_flag = '0'
             <if test="courseCode != null  and courseCode != ''"> and course_code like concat('%', #{courseCode}, '%')</if>
             <if test="courseName != null  and courseName != ''"> and course_name like concat('%', #{courseName}, '%')</if>
             <if test="courseEnglishName != null  and courseEnglishName != ''"> and course_english_name like concat('%', #{courseEnglishName}, '%')</if>
@@ -44,7 +45,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectCourseByCourseId" parameterType="Long" resultMap="CourseResult">
         <include refid="selectCourseVo"/>
-        where course_id = #{courseId}
+        where course_id = #{courseId} and del_flag = '0'
     </select>
 
     <insert id="insertCourse" parameterType="Course" useGeneratedKeys="true" keyProperty="courseId">

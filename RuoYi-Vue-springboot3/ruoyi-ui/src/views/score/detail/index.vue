@@ -144,9 +144,7 @@
         <el-form-item label="文件大小" prop="detailSize">
           <el-input v-model="form.detailSize" placeholder="请选择文件" readonly disabled />
         </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -259,7 +257,6 @@ export default {
         detailFile: null,
         detailSize: null,
         status: null,
-        delFlag: null,
         createTime: null,
         updateTime: null
       }

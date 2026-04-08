@@ -133,9 +133,7 @@
         <el-form-item label="文件大小" prop="reviewSize">
           <el-input v-model="form.reviewSize" placeholder="请选择文件" readonly disabled />
         </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-        </el-form-item>
+
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -246,7 +244,6 @@ export default {
         reviewFile: null,
         reviewSize: null,
         status: null,
-        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,
