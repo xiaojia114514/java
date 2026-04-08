@@ -1,14 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="课程ID" prop="courseId">
-        <el-input
-          v-model="queryParams.courseId"
-          placeholder="请输入课程ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="文件名称" prop="reviewName">
         <el-input
           v-model="queryParams.reviewName"
@@ -17,13 +9,11 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="文件大小" prop="reviewSize">
-        <el-input
-          v-model="queryParams.reviewSize"
-          placeholder="请输入文件大小"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+          <el-option label="正常" value="0" />
+          <el-option label="停用" value="1" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -80,12 +70,16 @@
     <el-table v-loading="loading" :data="reviewList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="审查ID" align="center" prop="reviewId" />
-      <el-table-column label="课程ID" align="center" prop="courseId" />
+      <el-table-column label="课程信息" align="center">
+        <template slot-scope="scope">
+          {{ getCourseInfo(scope.row.courseId) }}
+        </template>
+      </el-table-column>
       <el-table-column label="文件名称" align="center" prop="reviewName" />
       <el-table-column label="文件路径" align="center" prop="reviewFile" />
-      <el-table-column label="文件大小" align="center" prop="reviewSize">
+      <el-table-column label="文件大小" align="center">
         <template slot-scope="scope">
-          <span>{{ formatFileSize(scope.row.reviewSize) }}</span>
+          {{ formatFileSize(scope.row.reviewSize) }}
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status" />
@@ -106,6 +100,12 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['review:review:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-download"
+            @click="handleDownload(scope.row)"
+          >下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,8 +121,15 @@
     <!-- 添加或修改试卷实质审查对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程ID" prop="courseId">
-          <el-input v-model="form.courseId" placeholder="请输入课程ID" />
+        <el-form-item label="课程信息" prop="courseId">
+          <el-select v-model="form.courseId" placeholder="请选择课程" style="width: 100%">
+            <el-option
+              v-for="course in courseList"
+              :key="course.courseId"
+              :label="course.courseCode + ' - ' + course.courseName"
+              :value="course.courseId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="文件名称" prop="reviewName">
           <el-input v-model="form.reviewName" placeholder="请输入文件名称" />
@@ -131,7 +138,7 @@
           <file-upload v-model="form.reviewFile" @change="handleFileChange"/>
         </el-form-item>
         <el-form-item label="文件大小" prop="reviewSize">
-          <el-input v-model="form.reviewSize" placeholder="请选择文件" readonly disabled />
+          <el-input v-model="formattedReviewSize" placeholder="请选择文件" readonly disabled />
         </el-form-item>
 
         <el-form-item label="备注" prop="remark">
@@ -148,6 +155,8 @@
 
 <script>
 import { listReview, getReview, delReview, addReview, updateReview } from "@/api/review/review"
+import download from '@/plugins/download'
+import { listCourse } from "@/api/course/course"
 
 export default {
   name: "Review",
@@ -167,6 +176,10 @@ export default {
       total: 0,
       // 试卷实质审查表格数据
       reviewList: [],
+      // 课程列表
+      courseList: [],
+      // 课程信息映射
+      courseMap: {},
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -199,8 +212,37 @@ export default {
   },
   created() {
     this.getList()
+    this.getCourseList()
+  },
+  computed: {
+    /** 格式化后的文件大小 */
+    formattedReviewSize() {
+      return this.formatFileSize(this.form.reviewSize)
+    }
   },
   methods: {
+    /** 查询课程列表 */
+    getCourseList() {
+      listCourse({ pageNum: 1, pageSize: 1000 }).then(response => {
+        this.courseList = response.rows
+        // 构建课程信息映射
+        this.courseMap = {}
+        response.rows.forEach(course => {
+          this.courseMap[course.courseId] = course.courseCode + ' - ' + course.courseName
+        })
+      })
+    },
+    /** 获取课程信息 */
+    getCourseInfo(courseId) {
+      return this.courseMap[courseId] || courseId
+    },
+    /** 下载文件 */
+    handleDownload(row) {
+      if (row.reviewFile) {
+        // 下载文件，使用download插件
+        download.resource(row.reviewFile)
+      }
+    },
     /** 格式化文件大小 */
     formatFileSize(size) {
       if (!size || size === 0) return ''
@@ -215,10 +257,16 @@ export default {
     },
     /** 文件上传变更处理 */
     handleFileChange(fileInfo) {
-      if (fileInfo && fileInfo.size) {
-        this.form.reviewSize = this.formatFileSize(fileInfo.size)
+      if (fileInfo !== null && fileInfo !== undefined) {
+        // 存储原始字节数到form.reviewSize
+        this.form.reviewSize = fileInfo.size
+        // 从fileInfo中获取文件名并填充到文件名称文本框
+        if (fileInfo.name) {
+          this.form.reviewName = fileInfo.name
+        }
       } else {
-        this.form.reviewSize = ''
+        this.form.reviewSize = null
+        this.form.reviewName = ''
       }
     },
     /** 查询试卷实质审查列表 */

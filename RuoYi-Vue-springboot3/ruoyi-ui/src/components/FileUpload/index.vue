@@ -203,6 +203,8 @@ export default {
     handleDelete(index) {
       this.fileList.splice(index, 1)
       this.$emit("input", this.listToString(this.fileList))
+      // 触发change事件，通知父组件文件已删除
+      this.$emit("change", null)
     },
     // 上传结束处理
     uploadedSuccessfully() {
@@ -210,10 +212,12 @@ export default {
         this.fileList = this.fileList.concat(this.uploadList)
         const filePaths = this.listToString(this.fileList)
         const totalSize = this.fileList.reduce((sum, file) => sum + (file.size || 0), 0)
+        // 获取第一个文件的名称（因为我们只上传一个文件），并确保只返回纯文件名
+        const fileName = this.fileList.length > 0 ? this.getFileName(this.fileList[this.fileList.length - 1].name) : ''
         this.uploadList = []
         this.number = 0
         this.$emit("input", filePaths)
-        this.$emit("change", { paths: filePaths, size: totalSize })
+        this.$emit("change", { paths: filePaths, size: totalSize, name: fileName })
         this.$modal.closeLoading()
       }
     },

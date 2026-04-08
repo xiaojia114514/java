@@ -9,26 +9,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="课程ID" prop="courseId">
-        <el-input
-          v-model="queryParams.courseId"
-          placeholder="请输入课程ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="文件名称" prop="detailName">
         <el-input
           v-model="queryParams.detailName"
           placeholder="请输入文件名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="文件大小" prop="detailSize">
-        <el-input
-          v-model="queryParams.detailSize"
-          placeholder="请输入文件大小"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -89,7 +73,11 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="细目表ID" align="center" prop="scoreDetailId" />
       <el-table-column label="成绩单ID" align="center" prop="scoreId" />
-      <el-table-column label="课程ID" align="center" prop="courseId" />
+      <el-table-column label="课程信息" align="center">
+        <template slot-scope="scope">
+          {{ getCourseInfo(scope.row.courseId) }}
+        </template>
+      </el-table-column>
       <el-table-column label="文件名称" align="center" prop="detailName" />
       <el-table-column label="文件路径" align="center" prop="detailFile" />
       <el-table-column label="文件大小" align="center" prop="detailSize">
@@ -114,6 +102,12 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['score:detail:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-download"
+            @click="handleDownload(scope.row)"
+          >下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -132,8 +126,15 @@
         <el-form-item label="成绩单ID" prop="scoreId">
           <el-input v-model="form.scoreId" placeholder="请输入成绩单ID" />
         </el-form-item>
-        <el-form-item label="课程ID" prop="courseId">
-          <el-input v-model="form.courseId" placeholder="请输入课程ID" />
+        <el-form-item label="课程信息" prop="courseId">
+          <el-select v-model="form.courseId" placeholder="请选择课程" style="width: 100%">
+            <el-option
+              v-for="course in courseList"
+              :key="course.courseId"
+              :label="course.courseCode + ' - ' + course.courseName"
+              :value="course.courseId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="文件名称" prop="detailName">
           <el-input v-model="form.detailName" placeholder="请输入文件名称" />
@@ -142,7 +143,7 @@
           <file-upload v-model="form.detailFile" @change="handleFileChange"/>
         </el-form-item>
         <el-form-item label="文件大小" prop="detailSize">
-          <el-input v-model="form.detailSize" placeholder="请选择文件" readonly disabled />
+          <el-input v-model="formattedDetailSize" placeholder="请选择文件" readonly disabled />
         </el-form-item>
 
       </el-form>
@@ -156,6 +157,8 @@
 
 <script>
 import { listDetail, getDetail, delDetail, addDetail, updateDetail } from "@/api/score/detail"
+import download from '@/plugins/download'
+import { listCourse } from "@/api/course/course"
 
 export default {
   name: "Detail",
@@ -175,6 +178,10 @@ export default {
       total: 0,
       // 成绩细目表格数据
       detailList: [],
+      // 课程列表
+      courseList: [],
+      // 课程信息映射
+      courseMap: {},
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -211,8 +218,37 @@ export default {
   },
   created() {
     this.getList()
+    this.getCourseList()
+  },
+  computed: {
+    /** 格式化后的文件大小 */
+    formattedDetailSize() {
+      return this.formatFileSize(this.form.detailSize)
+    }
   },
   methods: {
+    /** 查询课程列表 */
+    getCourseList() {
+      listCourse({ pageNum: 1, pageSize: 1000 }).then(response => {
+        this.courseList = response.rows
+        // 构建课程信息映射
+        this.courseMap = {}
+        response.rows.forEach(course => {
+          this.courseMap[course.courseId] = course.courseCode + ' - ' + course.courseName
+        })
+      })
+    },
+    /** 获取课程信息 */
+    getCourseInfo(courseId) {
+      return this.courseMap[courseId] || courseId
+    },
+    /** 下载文件 */
+    handleDownload(row) {
+      if (row.detailFile) {
+        // 下载文件，使用download插件
+        download.resource(row.detailFile)
+      }
+    },
     /** 格式化文件大小 */
     formatFileSize(size) {
       if (!size || size === 0) return ''
@@ -227,10 +263,16 @@ export default {
     },
     /** 文件上传变更处理 */
     handleFileChange(fileInfo) {
-      if (fileInfo && fileInfo.size) {
-        this.form.detailSize = this.formatFileSize(fileInfo.size)
+      if (fileInfo !== null && fileInfo !== undefined) {
+        // 存储原始字节数到form.detailSize
+        this.form.detailSize = fileInfo.size
+        // 从fileInfo中获取文件名并填充到文件名称文本框
+        if (fileInfo.name) {
+          this.form.detailName = fileInfo.name
+        }
       } else {
-        this.form.detailSize = ''
+        this.form.detailSize = null
+        this.form.detailName = ''
       }
     },
     /** 查询成绩细目列表 */
