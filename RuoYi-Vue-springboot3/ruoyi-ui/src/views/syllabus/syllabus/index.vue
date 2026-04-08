@@ -1,10 +1,18 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="大纲名称" prop="syllabusName">
+      <el-form-item label="课程ID" prop="courseId">
+        <el-input
+          v-model="queryParams.courseId"
+          placeholder="请输入课程ID"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="文件名称" prop="syllabusName">
         <el-input
           v-model="queryParams.syllabusName"
-          placeholder="请输入大纲名称"
+          placeholder="请输入文件名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -13,14 +21,6 @@
         <el-input
           v-model="queryParams.syllabusSize"
           placeholder="请输入文件大小"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="版本号" prop="syllabusVersion">
-        <el-input
-          v-model="queryParams.syllabusVersion"
-          placeholder="请输入版本号"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -80,24 +80,14 @@
     <el-table v-loading="loading" :data="syllabusList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="大纲ID" align="center" prop="syllabusId" />
-      <el-table-column label="课程代码" align="center">
-        <template slot-scope="scope">
-          {{ getCourseCode(scope.row.courseId) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="课程名称" align="center">
-        <template slot-scope="scope">
-          {{ getCourseName(scope.row.courseId) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="大纲名称" align="center" prop="syllabusName" />
+      <el-table-column label="课程ID" align="center" prop="courseId" />
+      <el-table-column label="文件名称" align="center" prop="syllabusName" />
       <el-table-column label="文件路径" align="center" prop="syllabusFile" />
-      <el-table-column label="文件大小" align="center">
+      <el-table-column label="文件大小" align="center" prop="syllabusSize">
         <template slot-scope="scope">
-          {{ formatFileSize(scope.row.syllabusSize) }}
+          <span>{{ formatFileSize(scope.row.syllabusSize) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="版本号" align="center" prop="syllabusVersion" />
       <el-table-column label="状态" align="center" prop="status" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -116,12 +106,6 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['syllabus:syllabus:remove']"
           >删除</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-download"
-            @click="handleDownload(scope.row)"
-          >下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -137,27 +121,20 @@
     <!-- 添加或修改教学大纲对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程信息" prop="courseId">
-          <el-select v-model="form.courseId" placeholder="请选择课程" style="width: 100%">
-            <el-option
-              v-for="course in courseList"
-              :key="course.courseId"
-              :label="course.courseCode + ' - ' + course.courseName"
-              :value="course.courseId"
-            />
-          </el-select>
+        <el-form-item label="课程ID" prop="courseId">
+          <el-input v-model="form.courseId" placeholder="请输入课程ID" />
         </el-form-item>
-        <el-form-item label="大纲名称" prop="syllabusName">
-          <el-input v-model="form.syllabusName" placeholder="请输入大纲名称" />
+        <el-form-item label="文件名称" prop="syllabusName">
+          <el-input v-model="form.syllabusName" placeholder="请输入文件名称" />
         </el-form-item>
         <el-form-item label="文件路径" prop="syllabusFile">
           <file-upload v-model="form.syllabusFile" @change="handleFileChange"/>
         </el-form-item>
         <el-form-item label="文件大小" prop="syllabusSize">
-          <el-input :value="formatFileSize(form.syllabusSize)" placeholder="请输入文件大小" disabled />
+          <el-input v-model="form.syllabusSize" placeholder="请选择文件" readonly disabled />
         </el-form-item>
-        <el-form-item label="版本号" prop="syllabusVersion">
-          <el-input v-model="form.syllabusVersion" placeholder="请输入版本号" />
+        <el-form-item label="删除标志" prop="delFlag">
+          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -173,8 +150,6 @@
 
 <script>
 import { listSyllabus, getSyllabus, delSyllabus, addSyllabus, updateSyllabus } from "@/api/syllabus/syllabus"
-import download from '@/plugins/download'
-import { listCourse } from "@/api/course/course"
 
 export default {
   name: "Syllabus",
@@ -194,10 +169,6 @@ export default {
       total: 0,
       // 教学大纲表格数据
       syllabusList: [],
-      // 课程列表
-      courseList: [],
-      // 课程信息映射
-      courseMap: {},
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -210,7 +181,6 @@ export default {
         syllabusName: null,
         syllabusFile: null,
         syllabusSize: null,
-        syllabusVersion: null,
         status: null,
       },
       // 表单参数
@@ -218,7 +188,7 @@ export default {
       // 表单校验
       rules: {
         syllabusName: [
-          { required: true, message: "大纲名称不能为空", trigger: "blur" }
+          { required: true, message: "文件名称不能为空", trigger: "blur" }
         ],
         syllabusFile: [
           { required: true, message: "文件路径不能为空", trigger: "blur" }
@@ -228,9 +198,28 @@ export default {
   },
   created() {
     this.getList()
-    this.getCourseList()
   },
   methods: {
+    /** 格式化文件大小 */
+    formatFileSize(size) {
+      if (!size || size === 0) return ''
+      const units = ['B', 'KB', 'MB', 'GB']
+      let index = 0
+      let fileSize = size
+      while (fileSize >= 1024 && index < units.length - 1) {
+        fileSize /= 1024
+        index++
+      }
+      return fileSize.toFixed(2) + ' ' + units[index]
+    },
+    /** 文件上传变更处理 */
+    handleFileChange(fileInfo) {
+      if (fileInfo && fileInfo.size) {
+        this.form.syllabusSize = this.formatFileSize(fileInfo.size)
+      } else {
+        this.form.syllabusSize = ''
+      }
+    },
     /** 查询教学大纲列表 */
     getList() {
       this.loading = true
@@ -239,57 +228,6 @@ export default {
         this.total = response.total
         this.loading = false
       })
-    },
-    /** 查询课程列表 */
-    getCourseList() {
-      listCourse({ pageNum: 1, pageSize: 1000 }).then(response => {
-        this.courseList = response.rows
-        // 构建课程信息映射
-        this.courseMap = {}
-        response.rows.forEach(course => {
-          this.courseMap[course.courseId] = course.courseCode + ' - ' + course.courseName
-        })
-      })
-    },
-    /** 获取课程代码 */
-    getCourseCode(courseId) {
-      const course = this.courseList.find(c => c.courseId === courseId)
-      return course ? course.courseCode : courseId
-    },
-    /** 获取课程名称 */
-    getCourseName(courseId) {
-      const course = this.courseList.find(c => c.courseId === courseId)
-      return course ? course.courseName : courseId
-    },
-    /** 处理文件选择变化 */
-    handleFileChange(fileInfo) {
-      if (fileInfo) {
-        let filePaths = fileInfo
-        let fileSize = 0
-        
-        // 处理传递的对象格式
-        if (typeof fileInfo === 'object') {
-          filePaths = fileInfo.paths
-          fileSize = fileInfo.size
-        }
-        
-        // 从文件路径中提取文件名
-        const fileName = filePaths.split('/').pop()
-        // 自动填充大纲名称
-        if (!this.form.syllabusName) {
-          this.form.syllabusName = fileName
-        }
-        // 填充文件大小（存储原始字节值）
-        this.form.syllabusSize = fileSize
-      }
-    },
-    /** 格式化文件大小 */
-    formatFileSize(bytes) {
-      if (bytes === 0) return '0 B'
-      const k = 1024
-      const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-      const i = Math.floor(Math.log(bytes) / Math.log(k))
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
     // 取消按钮
     cancel() {
@@ -304,8 +242,8 @@ export default {
         syllabusName: null,
         syllabusFile: null,
         syllabusSize: null,
-        syllabusVersion: null,
         status: null,
+        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,
@@ -323,13 +261,6 @@ export default {
     resetQuery() {
       this.resetForm("queryForm")
       this.handleQuery()
-    },
-    /** 下载文件 */
-    handleDownload(row) {
-      if (row.syllabusFile) {
-        // 下载文件，使用download插件
-        download.resource(row.syllabusFile)
-      }
     },
     // 多选框选中数据
     handleSelectionChange(selection) {

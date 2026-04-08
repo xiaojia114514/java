@@ -25,18 +25,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="课程性质" prop="courseNature">
-        <el-input
-          v-model="queryParams.courseNature"
-          placeholder="请输入课程性质"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="总课时" prop="totalHours">
+      <el-form-item label="学时" prop="totalHours">
         <el-input
           v-model="queryParams.totalHours"
-          placeholder="请输入总课时"
+          placeholder="请输入学时"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -61,14 +53,6 @@
         <el-input
           v-model="queryParams.className"
           placeholder="请输入授课班级"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="所属部门ID" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入所属部门ID"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -132,11 +116,10 @@
       <el-table-column label="课程名称" align="center" prop="courseName" />
       <el-table-column label="英文名称" align="center" prop="courseEnglishName" />
       <el-table-column label="课程性质" align="center" prop="courseNature" />
-      <el-table-column label="总课时" align="center" prop="totalHours" />
+      <el-table-column label="学时" align="center" prop="totalHours" />
       <el-table-column label="学分" align="center" prop="credit" />
       <el-table-column label="开课学期" align="center" prop="semester" />
       <el-table-column label="授课班级" align="center" prop="className" />
-      <el-table-column label="所属部门ID" align="center" prop="deptId" />
       <el-table-column label="状态" align="center" prop="status" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -167,7 +150,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改课程对话框 -->
+    <!-- 添加或修改课程管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="课程代码" prop="courseCode">
@@ -179,11 +162,8 @@
         <el-form-item label="英文名称" prop="courseEnglishName">
           <el-input v-model="form.courseEnglishName" placeholder="请输入英文名称" />
         </el-form-item>
-        <el-form-item label="课程性质" prop="courseNature">
-          <el-input v-model="form.courseNature" placeholder="请输入课程性质" />
-        </el-form-item>
-        <el-form-item label="总课时" prop="totalHours">
-          <el-input v-model="form.totalHours" placeholder="请输入总课时" />
+        <el-form-item label="学时" prop="totalHours">
+          <el-input v-model="form.totalHours" placeholder="请输入学时" />
         </el-form-item>
         <el-form-item label="学分" prop="credit">
           <el-input v-model="form.credit" placeholder="请输入学分" />
@@ -194,8 +174,8 @@
         <el-form-item label="授课班级" prop="className">
           <el-input v-model="form.className" placeholder="请输入授课班级" />
         </el-form-item>
-        <el-form-item label="所属部门ID" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入所属部门ID" />
+        <el-form-item label="删除标志" prop="delFlag">
+          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -228,7 +208,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 课程表格数据
+      // 课程管理表格数据
       courseList: [],
       // 弹出层标题
       title: "",
@@ -246,7 +226,6 @@ export default {
         credit: null,
         semester: null,
         className: null,
-        deptId: null,
         status: null,
       },
       // 表单参数
@@ -266,7 +245,7 @@ export default {
     this.getList()
   },
   methods: {
-    /** 查询课程列表 */
+    /** 查询课程管理列表 */
     getList() {
       this.loading = true
       listCourse(this.queryParams).then(response => {
@@ -292,8 +271,8 @@ export default {
         credit: null,
         semester: null,
         className: null,
-        deptId: null,
         status: null,
+        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,
@@ -322,7 +301,7 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = "添加课程"
+      this.title = "添加课程管理"
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -331,7 +310,7 @@ export default {
       getCourse(courseId).then(response => {
         this.form = response.data
         this.open = true
-        this.title = "修改课程"
+        this.title = "修改课程管理"
       })
     },
     /** 提交按钮 */
@@ -357,7 +336,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const courseIds = row.courseId || this.ids
-      this.$modal.confirm('是否确认删除课程编号为"' + courseIds + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除课程管理编号为"' + courseIds + '"的数据项？').then(function() {
         return delCourse(courseIds)
       }).then(() => {
         this.getList()

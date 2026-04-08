@@ -7,7 +7,7 @@ import com.ruoyi.score.domain.ExamScore;
  * 考试成绩单Mapper接口
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 public interface ExamScoreMapper 
 {

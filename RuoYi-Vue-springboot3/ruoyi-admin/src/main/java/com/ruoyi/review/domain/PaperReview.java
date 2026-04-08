@@ -1,7 +1,5 @@
 package com.ruoyi.review.domain;
 
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -11,7 +9,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 试卷实质审查对象 paper_review
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 public class PaperReview extends BaseEntity
 {
@@ -20,13 +18,13 @@ public class PaperReview extends BaseEntity
     /** 审查ID */
     private Long reviewId;
 
-    /** 课程ID */
-    @Excel(name = "课程ID")
+    /** 课程ID（唯一约束） */
+    @Excel(name = "课程ID", readConverterExp = "唯=一约束")
     private Long courseId;
 
-    /** 试卷名称 */
-    @Excel(name = "试卷名称")
-    private String paperName;
+    /** 文件名称 */
+    @Excel(name = "文件名称")
+    private String reviewName;
 
     /** 文件路径 */
     @Excel(name = "文件路径")
@@ -36,14 +34,12 @@ public class PaperReview extends BaseEntity
     @Excel(name = "文件大小")
     private Long reviewSize;
 
-    /** 审查日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "审查日期", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date reviewDate;
-
     /** 状态（0正常 1停用） */
     @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
     private String status;
+
+    /** 删除标志（0代表存在 2代表删除） */
+    private String delFlag;
 
     public void setReviewId(Long reviewId) 
     {
@@ -65,14 +61,14 @@ public class PaperReview extends BaseEntity
         return courseId;
     }
 
-    public void setPaperName(String paperName) 
+    public void setReviewName(String reviewName) 
     {
-        this.paperName = paperName;
+        this.reviewName = reviewName;
     }
 
-    public String getPaperName() 
+    public String getReviewName() 
     {
-        return paperName;
+        return reviewName;
     }
 
     public void setReviewFile(String reviewFile) 
@@ -95,16 +91,6 @@ public class PaperReview extends BaseEntity
         return reviewSize;
     }
 
-    public void setReviewDate(Date reviewDate) 
-    {
-        this.reviewDate = reviewDate;
-    }
-
-    public Date getReviewDate() 
-    {
-        return reviewDate;
-    }
-
     public void setStatus(String status) 
     {
         this.status = status;
@@ -115,16 +101,26 @@ public class PaperReview extends BaseEntity
         return status;
     }
 
+    public void setDelFlag(String delFlag) 
+    {
+        this.delFlag = delFlag;
+    }
+
+    public String getDelFlag() 
+    {
+        return delFlag;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("reviewId", getReviewId())
             .append("courseId", getCourseId())
-            .append("paperName", getPaperName())
+            .append("reviewName", getReviewName())
             .append("reviewFile", getReviewFile())
             .append("reviewSize", getReviewSize())
-            .append("reviewDate", getReviewDate())
             .append("status", getStatus())
+            .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

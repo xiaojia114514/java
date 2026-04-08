@@ -1,4 +1,4 @@
-package com.ruoyi.syllabus.domain;
+package com.ruoyi.score.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -6,33 +6,37 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 教学大纲对象 syllabus
+ * 成绩细目对象 score_detail
  * 
  * @author ruoyi
  * @date 2026-04-08
  */
-public class Syllabus extends BaseEntity
+public class ScoreDetail extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 大纲ID */
-    private Long syllabusId;
+    /** 细目表ID */
+    private Long scoreDetailId;
 
-    /** 课程ID（唯一约束，允许为空） */
-    @Excel(name = "课程ID", readConverterExp = "唯=一约束，允许为空")
+    /** 成绩单ID */
+    @Excel(name = "成绩单ID")
+    private Long scoreId;
+
+    /** 课程ID */
+    @Excel(name = "课程ID")
     private Long courseId;
 
     /** 文件名称 */
     @Excel(name = "文件名称")
-    private String syllabusName;
+    private String detailName;
 
     /** 文件路径 */
     @Excel(name = "文件路径")
-    private String syllabusFile;
+    private String detailFile;
 
     /** 文件大小 */
     @Excel(name = "文件大小")
-    private Long syllabusSize;
+    private Long detailSize;
 
     /** 状态（0正常 1停用） */
     @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
@@ -41,14 +45,24 @@ public class Syllabus extends BaseEntity
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
 
-    public void setSyllabusId(Long syllabusId) 
+    public void setScoreDetailId(Long scoreDetailId) 
     {
-        this.syllabusId = syllabusId;
+        this.scoreDetailId = scoreDetailId;
     }
 
-    public Long getSyllabusId() 
+    public Long getScoreDetailId() 
     {
-        return syllabusId;
+        return scoreDetailId;
+    }
+
+    public void setScoreId(Long scoreId) 
+    {
+        this.scoreId = scoreId;
+    }
+
+    public Long getScoreId() 
+    {
+        return scoreId;
     }
 
     public void setCourseId(Long courseId) 
@@ -61,34 +75,34 @@ public class Syllabus extends BaseEntity
         return courseId;
     }
 
-    public void setSyllabusName(String syllabusName) 
+    public void setDetailName(String detailName) 
     {
-        this.syllabusName = syllabusName;
+        this.detailName = detailName;
     }
 
-    public String getSyllabusName() 
+    public String getDetailName() 
     {
-        return syllabusName;
+        return detailName;
     }
 
-    public void setSyllabusFile(String syllabusFile) 
+    public void setDetailFile(String detailFile) 
     {
-        this.syllabusFile = syllabusFile;
+        this.detailFile = detailFile;
     }
 
-    public String getSyllabusFile() 
+    public String getDetailFile() 
     {
-        return syllabusFile;
+        return detailFile;
     }
 
-    public void setSyllabusSize(Long syllabusSize) 
+    public void setDetailSize(Long detailSize) 
     {
-        this.syllabusSize = syllabusSize;
+        this.detailSize = detailSize;
     }
 
-    public Long getSyllabusSize() 
+    public Long getDetailSize() 
     {
-        return syllabusSize;
+        return detailSize;
     }
 
     public void setStatus(String status) 
@@ -114,18 +128,16 @@ public class Syllabus extends BaseEntity
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("syllabusId", getSyllabusId())
+            .append("scoreDetailId", getScoreDetailId())
+            .append("scoreId", getScoreId())
             .append("courseId", getCourseId())
-            .append("syllabusName", getSyllabusName())
-            .append("syllabusFile", getSyllabusFile())
-            .append("syllabusSize", getSyllabusSize())
+            .append("detailName", getDetailName())
+            .append("detailFile", getDetailFile())
+            .append("detailSize", getDetailSize())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
-            .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
-            .append("remark", getRemark())
             .toString();
     }
 }

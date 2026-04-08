@@ -25,7 +25,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * 教学大纲Controller
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 @RestController
 @RequestMapping("/syllabus/syllabus")

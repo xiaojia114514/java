@@ -22,10 +22,10 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 课程Controller
+ * 课程管理Controller
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 @RestController
 @RequestMapping("/course/course")
@@ -35,7 +35,7 @@ public class CourseController extends BaseController
     private ICourseService courseService;
 
     /**
-     * 查询课程列表
+     * 查询课程管理列表
      */
     @PreAuthorize("@ss.hasPermi('course:course:list')")
     @GetMapping("/list")
@@ -47,20 +47,20 @@ public class CourseController extends BaseController
     }
 
     /**
-     * 导出课程列表
+     * 导出课程管理列表
      */
     @PreAuthorize("@ss.hasPermi('course:course:export')")
-    @Log(title = "课程", businessType = BusinessType.EXPORT)
+    @Log(title = "课程管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, Course course)
     {
         List<Course> list = courseService.selectCourseList(course);
         ExcelUtil<Course> util = new ExcelUtil<Course>(Course.class);
-        util.exportExcel(response, list, "课程数据");
+        util.exportExcel(response, list, "课程管理数据");
     }
 
     /**
-     * 获取课程详细信息
+     * 获取课程管理详细信息
      */
     @PreAuthorize("@ss.hasPermi('course:course:query')")
     @GetMapping(value = "/{courseId}")
@@ -70,10 +70,10 @@ public class CourseController extends BaseController
     }
 
     /**
-     * 新增课程
+     * 新增课程管理
      */
     @PreAuthorize("@ss.hasPermi('course:course:add')")
-    @Log(title = "课程", businessType = BusinessType.INSERT)
+    @Log(title = "课程管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody Course course)
     {
@@ -81,10 +81,10 @@ public class CourseController extends BaseController
     }
 
     /**
-     * 修改课程
+     * 修改课程管理
      */
     @PreAuthorize("@ss.hasPermi('course:course:edit')")
-    @Log(title = "课程", businessType = BusinessType.UPDATE)
+    @Log(title = "课程管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody Course course)
     {
@@ -92,10 +92,10 @@ public class CourseController extends BaseController
     }
 
     /**
-     * 删除课程
+     * 删除课程管理
      */
     @PreAuthorize("@ss.hasPermi('course:course:remove')")
-    @Log(title = "课程", businessType = BusinessType.DELETE)
+    @Log(title = "课程管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{courseIds}")
     public AjaxResult remove(@PathVariable Long[] courseIds)
     {

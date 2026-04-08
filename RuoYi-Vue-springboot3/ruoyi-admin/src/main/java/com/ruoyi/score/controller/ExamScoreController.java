@@ -25,10 +25,10 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * 考试成绩单Controller
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 @RestController
-@RequestMapping("/score/score_list")
+@RequestMapping("/score/score")
 public class ExamScoreController extends BaseController
 {
     @Autowired
@@ -37,7 +37,7 @@ public class ExamScoreController extends BaseController
     /**
      * 查询考试成绩单列表
      */
-    @PreAuthorize("@ss.hasPermi('score:score_list:list')")
+    @PreAuthorize("@ss.hasPermi('score:score:list')")
     @GetMapping("/list")
     public TableDataInfo list(ExamScore examScore)
     {
@@ -49,7 +49,7 @@ public class ExamScoreController extends BaseController
     /**
      * 导出考试成绩单列表
      */
-    @PreAuthorize("@ss.hasPermi('score:score_list:export')")
+    @PreAuthorize("@ss.hasPermi('score:score:export')")
     @Log(title = "考试成绩单", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, ExamScore examScore)
@@ -62,7 +62,7 @@ public class ExamScoreController extends BaseController
     /**
      * 获取考试成绩单详细信息
      */
-    @PreAuthorize("@ss.hasPermi('score:score_list:query')")
+    @PreAuthorize("@ss.hasPermi('score:score:query')")
     @GetMapping(value = "/{scoreId}")
     public AjaxResult getInfo(@PathVariable("scoreId") Long scoreId)
     {
@@ -72,7 +72,7 @@ public class ExamScoreController extends BaseController
     /**
      * 新增考试成绩单
      */
-    @PreAuthorize("@ss.hasPermi('score:score_list:add')")
+    @PreAuthorize("@ss.hasPermi('score:score:add')")
     @Log(title = "考试成绩单", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody ExamScore examScore)
@@ -83,7 +83,7 @@ public class ExamScoreController extends BaseController
     /**
      * 修改考试成绩单
      */
-    @PreAuthorize("@ss.hasPermi('score:score_list:edit')")
+    @PreAuthorize("@ss.hasPermi('score:score:edit')")
     @Log(title = "考试成绩单", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody ExamScore examScore)
@@ -94,7 +94,7 @@ public class ExamScoreController extends BaseController
     /**
      * 删除考试成绩单
      */
-    @PreAuthorize("@ss.hasPermi('score:score_list:remove')")
+    @PreAuthorize("@ss.hasPermi('score:score:remove')")
     @Log(title = "考试成绩单", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{scoreIds}")
     public AjaxResult remove(@PathVariable Long[] scoreIds)

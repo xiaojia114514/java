@@ -7,7 +7,7 @@ import com.ruoyi.syllabus.domain.Syllabus;
  * 教学大纲Mapper接口
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 public interface SyllabusMapper 
 {

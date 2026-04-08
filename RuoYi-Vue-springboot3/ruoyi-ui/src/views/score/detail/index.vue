@@ -1,30 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="课程ID" prop="courseId">
-        <el-input
-          v-model="queryParams.courseId"
-          placeholder="请输入课程ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="大纲ID" prop="syllabusId">
-        <el-input
-          v-model="queryParams.syllabusId"
-          placeholder="请输入大纲ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="审查ID" prop="reviewId">
-        <el-input
-          v-model="queryParams.reviewId"
-          placeholder="请输入审查ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="成绩单ID" prop="scoreId">
         <el-input
           v-model="queryParams.scoreId"
@@ -33,13 +9,29 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="分析日期" prop="analysisDate">
-        <el-date-picker clearable
-          v-model="queryParams.analysisDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择分析日期">
-        </el-date-picker>
+      <el-form-item label="课程ID" prop="courseId">
+        <el-input
+          v-model="queryParams.courseId"
+          placeholder="请输入课程ID"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="文件名称" prop="detailName">
+        <el-input
+          v-model="queryParams.detailName"
+          placeholder="请输入文件名称"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="文件大小" prop="detailSize">
+        <el-input
+          v-model="queryParams.detailSize"
+          placeholder="请输入文件大小"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -55,7 +47,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['analysis:analysis:add']"
+          v-hasPermi="['score:detail:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -66,7 +58,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['analysis:analysis:edit']"
+          v-hasPermi="['score:detail:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -77,7 +69,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['analysis:analysis:remove']"
+          v-hasPermi="['score:detail:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -87,26 +79,25 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['analysis:analysis:export']"
+          v-hasPermi="['score:detail:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="analysisList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="detailList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="分析ID" align="center" prop="analysisId" />
-      <el-table-column label="课程ID" align="center" prop="courseId" />
-      <el-table-column label="大纲ID" align="center" prop="syllabusId" />
-      <el-table-column label="审查ID" align="center" prop="reviewId" />
+      <el-table-column label="细目表ID" align="center" prop="scoreDetailId" />
       <el-table-column label="成绩单ID" align="center" prop="scoreId" />
-      <el-table-column label="分析日期" align="center" prop="analysisDate" width="180">
+      <el-table-column label="课程ID" align="center" prop="courseId" />
+      <el-table-column label="文件名称" align="center" prop="detailName" />
+      <el-table-column label="文件路径" align="center" prop="detailFile" />
+      <el-table-column label="文件大小" align="center" prop="detailSize">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.analysisDate, '{y}-{m}-{d}') }}</span>
+          <span>{{ formatFileSize(scope.row.detailSize) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status" />
-      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -114,14 +105,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['analysis:analysis:edit']"
+            v-hasPermi="['score:detail:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['analysis:analysis:remove']"
+            v-hasPermi="['score:detail:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -135,31 +126,26 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改达成度分析对话框 -->
+    <!-- 添加或修改成绩细目对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程ID" prop="courseId">
-          <el-input v-model="form.courseId" placeholder="请输入课程ID" />
-        </el-form-item>
-        <el-form-item label="大纲ID" prop="syllabusId">
-          <el-input v-model="form.syllabusId" placeholder="请输入大纲ID" />
-        </el-form-item>
-        <el-form-item label="审查ID" prop="reviewId">
-          <el-input v-model="form.reviewId" placeholder="请输入审查ID" />
-        </el-form-item>
         <el-form-item label="成绩单ID" prop="scoreId">
           <el-input v-model="form.scoreId" placeholder="请输入成绩单ID" />
         </el-form-item>
-        <el-form-item label="分析日期" prop="analysisDate">
-          <el-date-picker clearable
-            v-model="form.analysisDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择分析日期">
-          </el-date-picker>
+        <el-form-item label="课程ID" prop="courseId">
+          <el-input v-model="form.courseId" placeholder="请输入课程ID" />
         </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="文件名称" prop="detailName">
+          <el-input v-model="form.detailName" placeholder="请输入文件名称" />
+        </el-form-item>
+        <el-form-item label="文件路径" prop="detailFile">
+          <file-upload v-model="form.detailFile" @change="handleFileChange"/>
+        </el-form-item>
+        <el-form-item label="文件大小" prop="detailSize">
+          <el-input v-model="form.detailSize" placeholder="请选择文件" readonly disabled />
+        </el-form-item>
+        <el-form-item label="删除标志" prop="delFlag">
+          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -171,10 +157,10 @@
 </template>
 
 <script>
-import { listAnalysis, getAnalysis, delAnalysis, addAnalysis, updateAnalysis } from "@/api/analysis/analysis"
+import { listDetail, getDetail, delDetail, addDetail, updateDetail } from "@/api/score/detail"
 
 export default {
-  name: "Analysis",
+  name: "Detail",
   data() {
     return {
       // 遮罩层
@@ -189,8 +175,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 达成度分析表格数据
-      analysisList: [],
+      // 成绩细目表格数据
+      detailList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -199,28 +185,28 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        courseId: null,
-        syllabusId: null,
-        reviewId: null,
         scoreId: null,
-        analysisDate: null,
+        courseId: null,
+        detailName: null,
+        detailFile: null,
+        detailSize: null,
         status: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
+        scoreId: [
+          { required: true, message: "成绩单ID不能为空", trigger: "blur" }
+        ],
         courseId: [
           { required: true, message: "课程ID不能为空", trigger: "blur" }
         ],
-        syllabusId: [
-          { required: true, message: "大纲ID不能为空", trigger: "blur" }
+        detailName: [
+          { required: true, message: "文件名称不能为空", trigger: "blur" }
         ],
-        reviewId: [
-          { required: true, message: "审查ID不能为空", trigger: "blur" }
-        ],
-        scoreId: [
-          { required: true, message: "成绩单ID不能为空", trigger: "blur" }
+        detailFile: [
+          { required: true, message: "文件路径不能为空", trigger: "blur" }
         ],
       }
     }
@@ -229,11 +215,31 @@ export default {
     this.getList()
   },
   methods: {
-    /** 查询达成度分析列表 */
+    /** 格式化文件大小 */
+    formatFileSize(size) {
+      if (!size || size === 0) return ''
+      const units = ['B', 'KB', 'MB', 'GB']
+      let index = 0
+      let fileSize = size
+      while (fileSize >= 1024 && index < units.length - 1) {
+        fileSize /= 1024
+        index++
+      }
+      return fileSize.toFixed(2) + ' ' + units[index]
+    },
+    /** 文件上传变更处理 */
+    handleFileChange(fileInfo) {
+      if (fileInfo && fileInfo.size) {
+        this.form.detailSize = this.formatFileSize(fileInfo.size)
+      } else {
+        this.form.detailSize = ''
+      }
+    },
+    /** 查询成绩细目列表 */
     getList() {
       this.loading = true
-      listAnalysis(this.queryParams).then(response => {
-        this.analysisList = response.rows
+      listDetail(this.queryParams).then(response => {
+        this.detailList = response.rows
         this.total = response.total
         this.loading = false
       })
@@ -246,18 +252,16 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        analysisId: null,
-        courseId: null,
-        syllabusId: null,
-        reviewId: null,
+        scoreDetailId: null,
         scoreId: null,
-        analysisDate: null,
+        courseId: null,
+        detailName: null,
+        detailFile: null,
+        detailSize: null,
         status: null,
-        createBy: null,
+        delFlag: null,
         createTime: null,
-        updateBy: null,
-        updateTime: null,
-        remark: null
+        updateTime: null
       }
       this.resetForm("form")
     },
@@ -273,7 +277,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.analysisId)
+      this.ids = selection.map(item => item.scoreDetailId)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -281,30 +285,30 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = "添加达成度分析"
+      this.title = "添加成绩细目"
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      const analysisId = row.analysisId || this.ids
-      getAnalysis(analysisId).then(response => {
+      const scoreDetailId = row.scoreDetailId || this.ids
+      getDetail(scoreDetailId).then(response => {
         this.form = response.data
         this.open = true
-        this.title = "修改达成度分析"
+        this.title = "修改成绩细目"
       })
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.analysisId != null) {
-            updateAnalysis(this.form).then(response => {
+          if (this.form.scoreDetailId != null) {
+            updateDetail(this.form).then(response => {
               this.$modal.msgSuccess("修改成功")
               this.open = false
               this.getList()
             })
           } else {
-            addAnalysis(this.form).then(response => {
+            addDetail(this.form).then(response => {
               this.$modal.msgSuccess("新增成功")
               this.open = false
               this.getList()
@@ -315,9 +319,9 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const analysisIds = row.analysisId || this.ids
-      this.$modal.confirm('是否确认删除达成度分析编号为"' + analysisIds + '"的数据项？').then(function() {
-        return delAnalysis(analysisIds)
+      const scoreDetailIds = row.scoreDetailId || this.ids
+      this.$modal.confirm('是否确认删除成绩细目编号为"' + scoreDetailIds + '"的数据项？').then(function() {
+        return delDetail(scoreDetailIds)
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess("删除成功")
@@ -325,9 +329,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('analysis/analysis/export', {
+      this.download('score/detail/export', {
         ...this.queryParams
-      }, `analysis_${new Date().getTime()}.xlsx`)
+      }, `detail_${new Date().getTime()}.xlsx`)
     }
   }
 }

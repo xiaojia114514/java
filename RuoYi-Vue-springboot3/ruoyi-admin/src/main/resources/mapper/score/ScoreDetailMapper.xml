@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.score.mapper.ScoreDetailMapper">
+    
+    <resultMap type="ScoreDetail" id="ScoreDetailResult">
+        <result property="scoreDetailId"    column="score_detail_id"    />
+        <result property="scoreId"    column="score_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="detailName"    column="detail_name"    />
+        <result property="detailFile"    column="detail_file"    />
+        <result property="detailSize"    column="detail_size"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectScoreDetailVo">
+        select score_detail_id, score_id, course_id, detail_name, detail_file, detail_size, status, del_flag, create_time, update_time from score_detail
+    </sql>
+
+    <select id="selectScoreDetailList" parameterType="ScoreDetail" resultMap="ScoreDetailResult">
+        <include refid="selectScoreDetailVo"/>
+        <where>  
+            <if test="scoreId != null "> and score_id = #{scoreId}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="detailName != null  and detailName != ''"> and detail_name like concat('%', #{detailName}, '%')</if>
+            <if test="detailFile != null  and detailFile != ''"> and detail_file = #{detailFile}</if>
+            <if test="detailSize != null "> and detail_size = #{detailSize}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectScoreDetailByScoreDetailId" parameterType="Long" resultMap="ScoreDetailResult">
+        <include refid="selectScoreDetailVo"/>
+        where score_detail_id = #{scoreDetailId}
+    </select>
+
+    <insert id="insertScoreDetail" parameterType="ScoreDetail" useGeneratedKeys="true" keyProperty="scoreDetailId">
+        insert into score_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scoreId != null">score_id,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="detailName != null and detailName != ''">detail_name,</if>
+            <if test="detailFile != null and detailFile != ''">detail_file,</if>
+            <if test="detailSize != null">detail_size,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scoreId != null">#{scoreId},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="detailName != null and detailName != ''">#{detailName},</if>
+            <if test="detailFile != null and detailFile != ''">#{detailFile},</if>
+            <if test="detailSize != null">#{detailSize},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateScoreDetail" parameterType="ScoreDetail">
+        update score_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scoreId != null">score_id = #{scoreId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="detailName != null and detailName != ''">detail_name = #{detailName},</if>
+            <if test="detailFile != null and detailFile != ''">detail_file = #{detailFile},</if>
+            <if test="detailSize != null">detail_size = #{detailSize},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where score_detail_id = #{scoreDetailId}
+    </update>
+
+    <delete id="deleteScoreDetailByScoreDetailId" parameterType="Long">
+        delete from score_detail where score_detail_id = #{scoreDetailId}
+    </delete>
+
+    <delete id="deleteScoreDetailByScoreDetailIds" parameterType="String">
+        delete from score_detail where score_detail_id in 
+        <foreach item="scoreDetailId" collection="array" open="(" separator="," close=")">
+            #{scoreDetailId}
+        </foreach>
+    </delete>
+</mapper>

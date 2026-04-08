@@ -7,10 +7,10 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 课程对象 course
+ * 课程管理对象 course
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 public class Course extends BaseEntity
 {
@@ -35,8 +35,8 @@ public class Course extends BaseEntity
     @Excel(name = "课程性质")
     private String courseNature;
 
-    /** 总课时 */
-    @Excel(name = "总课时")
+    /** 学时 */
+    @Excel(name = "学时")
     private Long totalHours;
 
     /** 学分 */
@@ -51,13 +51,12 @@ public class Course extends BaseEntity
     @Excel(name = "授课班级")
     private String className;
 
-    /** 所属部门ID */
-    @Excel(name = "所属部门ID")
-    private Long deptId;
-
     /** 状态（0正常 1停用） */
     @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
     private String status;
+
+    /** 删除标志（0代表存在 2代表删除） */
+    private String delFlag;
 
     public void setCourseId(Long courseId) 
     {
@@ -149,16 +148,6 @@ public class Course extends BaseEntity
         return className;
     }
 
-    public void setDeptId(Long deptId) 
-    {
-        this.deptId = deptId;
-    }
-
-    public Long getDeptId() 
-    {
-        return deptId;
-    }
-
     public void setStatus(String status) 
     {
         this.status = status;
@@ -167,6 +156,16 @@ public class Course extends BaseEntity
     public String getStatus() 
     {
         return status;
+    }
+
+    public void setDelFlag(String delFlag) 
+    {
+        this.delFlag = delFlag;
+    }
+
+    public String getDelFlag() 
+    {
+        return delFlag;
     }
 
     @Override
@@ -181,8 +180,8 @@ public class Course extends BaseEntity
             .append("credit", getCredit())
             .append("semester", getSemester())
             .append("className", getClassName())
-            .append("deptId", getDeptId())
             .append("status", getStatus())
+            .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

@@ -9,14 +9,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="分析ID" prop="analysisId">
-        <el-input
-          v-model="queryParams.analysisId"
-          placeholder="请输入分析ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="报告名称" prop="reportName">
         <el-input
           v-model="queryParams.reportName"
@@ -24,14 +16,6 @@
           clearable
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="报告生成日期" prop="reportDate">
-        <el-date-picker clearable
-          v-model="queryParams.reportDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择报告生成日期">
-        </el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -89,15 +73,8 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="报告ID" align="center" prop="reportId" />
       <el-table-column label="课程ID" align="center" prop="courseId" />
-      <el-table-column label="分析ID" align="center" prop="analysisId" />
       <el-table-column label="报告名称" align="center" prop="reportName" />
       <el-table-column label="报告内容" align="center" prop="reportContent" />
-      <el-table-column label="报告文件路径" align="center" prop="reportFile" />
-      <el-table-column label="报告生成日期" align="center" prop="reportDate" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.reportDate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="状态" align="center" prop="status" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -134,25 +111,11 @@
         <el-form-item label="课程ID" prop="courseId">
           <el-input v-model="form.courseId" placeholder="请输入课程ID" />
         </el-form-item>
-        <el-form-item label="分析ID" prop="analysisId">
-          <el-input v-model="form.analysisId" placeholder="请输入分析ID" />
-        </el-form-item>
         <el-form-item label="报告名称" prop="reportName">
           <el-input v-model="form.reportName" placeholder="请输入报告名称" />
         </el-form-item>
         <el-form-item label="报告内容">
           <editor v-model="form.reportContent" :min-height="192"/>
-        </el-form-item>
-        <el-form-item label="报告文件路径" prop="reportFile">
-          <file-upload v-model="form.reportFile"/>
-        </el-form-item>
-        <el-form-item label="报告生成日期" prop="reportDate">
-          <el-date-picker clearable
-            v-model="form.reportDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择报告生成日期">
-          </el-date-picker>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -196,11 +159,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         courseId: null,
-        analysisId: null,
         reportName: null,
         reportContent: null,
-        reportFile: null,
-        reportDate: null,
         status: null,
       },
       // 表单参数
@@ -209,9 +169,6 @@ export default {
       rules: {
         courseId: [
           { required: true, message: "课程ID不能为空", trigger: "blur" }
-        ],
-        analysisId: [
-          { required: true, message: "分析ID不能为空", trigger: "blur" }
         ],
         reportName: [
           { required: true, message: "报告名称不能为空", trigger: "blur" }
@@ -242,11 +199,8 @@ export default {
       this.form = {
         reportId: null,
         courseId: null,
-        analysisId: null,
         reportName: null,
         reportContent: null,
-        reportFile: null,
-        reportDate: null,
         status: null,
         createBy: null,
         createTime: null,

@@ -7,7 +7,7 @@ import com.ruoyi.report.domain.QualityReport;
  * 课程教学质量分析报告Service接口
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 public interface IQualityReportService 
 {

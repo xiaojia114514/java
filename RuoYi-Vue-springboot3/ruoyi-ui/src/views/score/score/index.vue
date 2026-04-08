@@ -1,14 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="成绩单ID" prop="scoreId">
-        <el-input
-          v-model="queryParams.scoreId"
-          placeholder="请输入成绩单ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="课程ID" prop="courseId">
         <el-input
           v-model="queryParams.courseId"
@@ -17,26 +9,18 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="学生ID" prop="studentId">
+      <el-form-item label="文件名称" prop="scoreName">
         <el-input
-          v-model="queryParams.studentId"
-          placeholder="请输入学生ID"
+          v-model="queryParams.scoreName"
+          placeholder="请输入文件名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="学生姓名" prop="studentName">
+      <el-form-item label="文件大小" prop="scoreSize">
         <el-input
-          v-model="queryParams.studentName"
-          placeholder="请输入学生姓名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="总分" prop="totalScore">
-        <el-input
-          v-model="queryParams.totalScore"
-          placeholder="请输入总分"
+          v-model="queryParams.scoreSize"
+          placeholder="请输入文件大小"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -95,14 +79,17 @@
 
     <el-table v-loading="loading" :data="scoreList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="学生成绩ID" align="center" prop="studentScoreId" />
       <el-table-column label="成绩单ID" align="center" prop="scoreId" />
       <el-table-column label="课程ID" align="center" prop="courseId" />
-      <el-table-column label="学生ID" align="center" prop="studentId" />
-      <el-table-column label="学生姓名" align="center" prop="studentName" />
-      <el-table-column label="总分" align="center" prop="totalScore" />
-      <el-table-column label="成绩详情" align="center" prop="scoreDetails" />
+      <el-table-column label="文件名称" align="center" prop="scoreName" />
+      <el-table-column label="文件路径" align="center" prop="scoreFile" />
+      <el-table-column label="文件大小" align="center" prop="scoreSize">
+        <template slot-scope="scope">
+          <span>{{ formatFileSize(scope.row.scoreSize) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -131,26 +118,26 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改学生成绩对话框 -->
+    <!-- 添加或修改考试成绩单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="成绩单ID" prop="scoreId">
-          <el-input v-model="form.scoreId" placeholder="请输入成绩单ID" />
-        </el-form-item>
         <el-form-item label="课程ID" prop="courseId">
           <el-input v-model="form.courseId" placeholder="请输入课程ID" />
         </el-form-item>
-        <el-form-item label="学生ID" prop="studentId">
-          <el-input v-model="form.studentId" placeholder="请输入学生ID" />
+        <el-form-item label="文件名称" prop="scoreName">
+          <el-input v-model="form.scoreName" placeholder="请输入文件名称" />
         </el-form-item>
-        <el-form-item label="学生姓名" prop="studentName">
-          <el-input v-model="form.studentName" placeholder="请输入学生姓名" />
+        <el-form-item label="文件路径" prop="scoreFile">
+          <file-upload v-model="form.scoreFile" @change="handleFileChange"/>
         </el-form-item>
-        <el-form-item label="总分" prop="totalScore">
-          <el-input v-model="form.totalScore" placeholder="请输入总分" />
+        <el-form-item label="文件大小" prop="scoreSize">
+          <el-input v-model="form.scoreSize" placeholder="请选择文件" readonly disabled />
         </el-form-item>
-        <el-form-item label="成绩详情" prop="scoreDetails">
-          <el-input v-model="form.scoreDetails" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="删除标志" prop="delFlag">
+          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -180,7 +167,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 学生成绩表格数据
+      // 考试成绩单表格数据
       scoreList: [],
       // 弹出层标题
       title: "",
@@ -190,29 +177,24 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        scoreId: null,
         courseId: null,
-        studentId: null,
-        studentName: null,
-        totalScore: null,
-        scoreDetails: null,
+        scoreName: null,
+        scoreFile: null,
+        scoreSize: null,
         status: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        scoreId: [
-          { required: true, message: "成绩单ID不能为空", trigger: "blur" }
-        ],
         courseId: [
           { required: true, message: "课程ID不能为空", trigger: "blur" }
         ],
-        studentId: [
-          { required: true, message: "学生ID不能为空", trigger: "blur" }
+        scoreName: [
+          { required: true, message: "文件名称不能为空", trigger: "blur" }
         ],
-        studentName: [
-          { required: true, message: "学生姓名不能为空", trigger: "blur" }
+        scoreFile: [
+          { required: true, message: "文件路径不能为空", trigger: "blur" }
         ],
       }
     }
@@ -221,7 +203,27 @@ export default {
     this.getList()
   },
   methods: {
-    /** 查询学生成绩列表 */
+    /** 格式化文件大小 */
+    formatFileSize(size) {
+      if (!size || size === 0) return ''
+      const units = ['B', 'KB', 'MB', 'GB']
+      let index = 0
+      let fileSize = size
+      while (fileSize >= 1024 && index < units.length - 1) {
+        fileSize /= 1024
+        index++
+      }
+      return fileSize.toFixed(2) + ' ' + units[index]
+    },
+    /** 文件上传变更处理 */
+    handleFileChange(fileInfo) {
+      if (fileInfo && fileInfo.size) {
+        this.form.scoreSize = this.formatFileSize(fileInfo.size)
+      } else {
+        this.form.scoreSize = ''
+      }
+    },
+    /** 查询考试成绩单列表 */
     getList() {
       this.loading = true
       listScore(this.queryParams).then(response => {
@@ -238,16 +240,18 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        studentScoreId: null,
         scoreId: null,
         courseId: null,
-        studentId: null,
-        studentName: null,
-        totalScore: null,
-        scoreDetails: null,
+        scoreName: null,
+        scoreFile: null,
+        scoreSize: null,
         status: null,
+        delFlag: null,
+        createBy: null,
         createTime: null,
-        updateTime: null
+        updateBy: null,
+        updateTime: null,
+        remark: null
       }
       this.resetForm("form")
     },
@@ -263,7 +267,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.studentScoreId)
+      this.ids = selection.map(item => item.scoreId)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -271,23 +275,23 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = "添加学生成绩"
+      this.title = "添加考试成绩单"
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      const studentScoreId = row.studentScoreId || this.ids
-      getScore(studentScoreId).then(response => {
+      const scoreId = row.scoreId || this.ids
+      getScore(scoreId).then(response => {
         this.form = response.data
         this.open = true
-        this.title = "修改学生成绩"
+        this.title = "修改考试成绩单"
       })
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.studentScoreId != null) {
+          if (this.form.scoreId != null) {
             updateScore(this.form).then(response => {
               this.$modal.msgSuccess("修改成功")
               this.open = false
@@ -305,9 +309,9 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const studentScoreIds = row.studentScoreId || this.ids
-      this.$modal.confirm('是否确认删除学生成绩编号为"' + studentScoreIds + '"的数据项？').then(function() {
-        return delScore(studentScoreIds)
+      const scoreIds = row.scoreId || this.ids
+      this.$modal.confirm('是否确认删除考试成绩单编号为"' + scoreIds + '"的数据项？').then(function() {
+        return delScore(scoreIds)
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess("删除成功")

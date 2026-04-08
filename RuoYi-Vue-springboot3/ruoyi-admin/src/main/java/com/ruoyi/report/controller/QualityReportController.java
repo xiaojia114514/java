@@ -25,7 +25,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * 课程教学质量分析报告Controller
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 @RestController
 @RequestMapping("/report/report")

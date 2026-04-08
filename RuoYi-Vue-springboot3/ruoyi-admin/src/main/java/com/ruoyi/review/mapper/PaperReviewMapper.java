@@ -7,7 +7,7 @@ import com.ruoyi.review.domain.PaperReview;
  * 试卷实质审查Mapper接口
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 public interface PaperReviewMapper 
 {

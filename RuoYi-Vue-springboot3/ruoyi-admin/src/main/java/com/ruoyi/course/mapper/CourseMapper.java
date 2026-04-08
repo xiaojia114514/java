@@ -4,55 +4,55 @@ import java.util.List;
 import com.ruoyi.course.domain.Course;
 
 /**
- * 课程Mapper接口
+ * 课程管理Mapper接口
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 public interface CourseMapper 
 {
     /**
-     * 查询课程
+     * 查询课程管理
      * 
-     * @param courseId 课程主键
-     * @return 课程
+     * @param courseId 课程管理主键
+     * @return 课程管理
      */
     public Course selectCourseByCourseId(Long courseId);
 
     /**
-     * 查询课程列表
+     * 查询课程管理列表
      * 
-     * @param course 课程
-     * @return 课程集合
+     * @param course 课程管理
+     * @return 课程管理集合
      */
     public List<Course> selectCourseList(Course course);
 
     /**
-     * 新增课程
+     * 新增课程管理
      * 
-     * @param course 课程
+     * @param course 课程管理
      * @return 结果
      */
     public int insertCourse(Course course);
 
     /**
-     * 修改课程
+     * 修改课程管理
      * 
-     * @param course 课程
+     * @param course 课程管理
      * @return 结果
      */
     public int updateCourse(Course course);
 
     /**
-     * 删除课程
+     * 删除课程管理
      * 
-     * @param courseId 课程主键
+     * @param courseId 课程管理主键
      * @return 结果
      */
     public int deleteCourseByCourseId(Long courseId);
 
     /**
-     * 批量删除课程
+     * 批量删除课程管理
      * 
      * @param courseIds 需要删除的数据主键集合
      * @return 结果

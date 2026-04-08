@@ -7,11 +7,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="PaperReview" id="PaperReviewResult">
         <result property="reviewId"    column="review_id"    />
         <result property="courseId"    column="course_id"    />
-        <result property="paperName"    column="paper_name"    />
+        <result property="reviewName"    column="review_name"    />
         <result property="reviewFile"    column="review_file"    />
         <result property="reviewSize"    column="review_size"    />
-        <result property="reviewDate"    column="review_date"    />
         <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -20,17 +20,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectPaperReviewVo">
-        select review_id, course_id, paper_name, review_file, review_size, review_date, status, create_by, create_time, update_by, update_time, remark from paper_review
+        select review_id, course_id, review_name, review_file, review_size, status, del_flag, create_by, create_time, update_by, update_time, remark from paper_review
     </sql>
 
     <select id="selectPaperReviewList" parameterType="PaperReview" resultMap="PaperReviewResult">
         <include refid="selectPaperReviewVo"/>
         <where>  
             <if test="courseId != null "> and course_id = #{courseId}</if>
-            <if test="paperName != null  and paperName != ''"> and paper_name like concat('%', #{paperName}, '%')</if>
+            <if test="reviewName != null  and reviewName != ''"> and review_name like concat('%', #{reviewName}, '%')</if>
             <if test="reviewFile != null  and reviewFile != ''"> and review_file = #{reviewFile}</if>
             <if test="reviewSize != null "> and review_size = #{reviewSize}</if>
-            <if test="reviewDate != null "> and review_date = #{reviewDate}</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
         </where>
     </select>
@@ -44,11 +43,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into paper_review
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="courseId != null">course_id,</if>
-            <if test="paperName != null and paperName != ''">paper_name,</if>
+            <if test="reviewName != null and reviewName != ''">review_name,</if>
             <if test="reviewFile != null and reviewFile != ''">review_file,</if>
             <if test="reviewSize != null">review_size,</if>
-            <if test="reviewDate != null">review_date,</if>
             <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -57,11 +56,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="courseId != null">#{courseId},</if>
-            <if test="paperName != null and paperName != ''">#{paperName},</if>
+            <if test="reviewName != null and reviewName != ''">#{reviewName},</if>
             <if test="reviewFile != null and reviewFile != ''">#{reviewFile},</if>
             <if test="reviewSize != null">#{reviewSize},</if>
-            <if test="reviewDate != null">#{reviewDate},</if>
             <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -74,11 +73,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update paper_review
         <trim prefix="SET" suffixOverrides=",">
             <if test="courseId != null">course_id = #{courseId},</if>
-            <if test="paperName != null and paperName != ''">paper_name = #{paperName},</if>
+            <if test="reviewName != null and reviewName != ''">review_name = #{reviewName},</if>
             <if test="reviewFile != null and reviewFile != ''">review_file = #{reviewFile},</if>
             <if test="reviewSize != null">review_size = #{reviewSize},</if>
-            <if test="reviewDate != null">review_date = #{reviewDate},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

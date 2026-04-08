@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询学生成绩列表
+// 查询考试成绩单列表
 export function listScore(query) {
   return request({
     url: '/score/score/list',
@@ -9,15 +9,15 @@ export function listScore(query) {
   })
 }
 
-// 查询学生成绩详细
-export function getScore(studentScoreId) {
+// 查询考试成绩单详细
+export function getScore(scoreId) {
   return request({
-    url: '/score/score/' + studentScoreId,
+    url: '/score/score/' + scoreId,
     method: 'get'
   })
 }
 
-// 新增学生成绩
+// 新增考试成绩单
 export function addScore(data) {
   return request({
     url: '/score/score',
@@ -26,7 +26,7 @@ export function addScore(data) {
   })
 }
 
-// 修改学生成绩
+// 修改考试成绩单
 export function updateScore(data) {
   return request({
     url: '/score/score',
@@ -35,10 +35,10 @@ export function updateScore(data) {
   })
 }
 
-// 删除学生成绩
-export function delScore(studentScoreId) {
+// 删除考试成绩单
+export function delScore(scoreId) {
   return request({
-    url: '/score/score/' + studentScoreId,
+    url: '/score/score/' + scoreId,
     method: 'delete'
   })
 }

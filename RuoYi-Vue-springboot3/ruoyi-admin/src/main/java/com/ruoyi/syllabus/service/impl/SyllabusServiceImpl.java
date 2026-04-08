@@ -12,7 +12,7 @@ import com.ruoyi.syllabus.service.ISyllabusService;
  * 教学大纲Service业务层处理
  * 
  * @author ruoyi
- * @date 2026-04-07
+ * @date 2026-04-08
  */
 @Service
 public class SyllabusServiceImpl implements ISyllabusService 
