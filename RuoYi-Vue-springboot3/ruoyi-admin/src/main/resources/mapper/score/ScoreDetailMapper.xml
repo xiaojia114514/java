@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="scoreDetailId"    column="score_detail_id"    />
         <result property="scoreId"    column="score_id"    />
         <result property="courseId"    column="course_id"    />
+        <result property="courseName"    column="course_name"    />
         <result property="detailName"    column="detail_name"    />
         <result property="detailFile"    column="detail_file"    />
         <result property="detailSize"    column="detail_size"    />
@@ -18,25 +19,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectScoreDetailVo">
-        select score_detail_id, score_id, course_id, detail_name, detail_file, detail_size, status, del_flag, create_time, update_time from score_detail
+        select s.score_detail_id, s.score_id, s.course_id, c.course_name, s.detail_name, s.detail_file, s.detail_size, s.status, s.del_flag, s.create_time, s.update_time 
+        from score_detail s
+        left join course c on s.course_id = c.course_id
     </sql>
 
     <select id="selectScoreDetailList" parameterType="ScoreDetail" resultMap="ScoreDetailResult">
         <include refid="selectScoreDetailVo"/>
         <where>  
-            del_flag = '0'
-            <if test="scoreId != null "> and score_id = #{scoreId}</if>
-            <if test="courseId != null "> and course_id = #{courseId}</if>
-            <if test="detailName != null  and detailName != ''"> and detail_name like concat('%', #{detailName}, '%')</if>
-            <if test="detailFile != null  and detailFile != ''"> and detail_file = #{detailFile}</if>
-            <if test="detailSize != null "> and detail_size = #{detailSize}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+            s.del_flag = '0'
+            <if test="scoreId != null "> and s.score_id = #{scoreId}</if>
+            <if test="courseId != null "> and s.course_id = #{courseId}</if>
+            <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
+            <if test="detailName != null  and detailName != ''"> and s.detail_name like concat('%', #{detailName}, '%')</if>
+            <if test="detailFile != null  and detailFile != ''"> and s.detail_file = #{detailFile}</if>
+            <if test="detailSize != null "> and s.detail_size = #{detailSize}</if>
+            <if test="status != null  and status != ''"> and s.status = #{status}</if>
         </where>
     </select>
     
     <select id="selectScoreDetailByScoreDetailId" parameterType="Long" resultMap="ScoreDetailResult">
         <include refid="selectScoreDetailVo"/>
-        where score_detail_id = #{scoreDetailId} and del_flag = '0'
+        where s.score_detail_id = #{scoreDetailId} and s.del_flag = '0'
     </select>
 
     <insert id="insertScoreDetail" parameterType="ScoreDetail" useGeneratedKeys="true" keyProperty="scoreDetailId">

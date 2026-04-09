@@ -7,6 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="QualityReport" id="QualityReportResult">
         <result property="reportId"    column="report_id"    />
         <result property="courseId"    column="course_id"    />
+        <result property="courseName"    column="course_name"    />
         <result property="reportName"    column="report_name"    />
         <result property="reportContent"    column="report_content"    />
         <result property="status"    column="status"    />
@@ -19,23 +20,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectQualityReportVo">
-        select report_id, course_id, report_name, report_content, status, del_flag, create_by, create_time, update_by, update_time, remark from quality_report
+        select q.report_id, q.course_id, c.course_name, q.report_name, q.report_content, q.status, q.del_flag, q.create_by, q.create_time, q.update_by, q.update_time, q.remark 
+        from quality_report q
+        left join course c on q.course_id = c.course_id
     </sql>
 
     <select id="selectQualityReportList" parameterType="QualityReport" resultMap="QualityReportResult">
         <include refid="selectQualityReportVo"/>
         <where>  
-            del_flag = '0'
-            <if test="courseId != null "> and course_id = #{courseId}</if>
-            <if test="reportName != null  and reportName != ''"> and report_name like concat('%', #{reportName}, '%')</if>
-            <if test="reportContent != null  and reportContent != ''"> and report_content = #{reportContent}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+            q.del_flag = '0'
+            <if test="courseId != null "> and q.course_id = #{courseId}</if>
+            <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
+            <if test="reportName != null  and reportName != ''"> and q.report_name like concat('%', #{reportName}, '%')</if>
+            <if test="reportContent != null  and reportContent != ''"> and q.report_content = #{reportContent}</if>
+            <if test="status != null  and status != ''"> and q.status = #{status}</if>
         </where>
     </select>
     
     <select id="selectQualityReportByReportId" parameterType="Long" resultMap="QualityReportResult">
         <include refid="selectQualityReportVo"/>
-        where report_id = #{reportId} and del_flag = '0'
+        where q.report_id = #{reportId} and q.del_flag = '0'
     </select>
 
     <insert id="insertQualityReport" parameterType="QualityReport" useGeneratedKeys="true" keyProperty="reportId">

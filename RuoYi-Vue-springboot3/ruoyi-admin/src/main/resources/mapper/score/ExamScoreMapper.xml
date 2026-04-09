@@ -7,6 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="ExamScore" id="ExamScoreResult">
         <result property="scoreId"    column="score_id"    />
         <result property="courseId"    column="course_id"    />
+        <result property="courseName"    column="course_name"    />
         <result property="scoreName"    column="score_name"    />
         <result property="scoreFile"    column="score_file"    />
         <result property="scoreSize"    column="score_size"    />
@@ -20,24 +21,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectExamScoreVo">
-        select score_id, course_id, score_name, score_file, score_size, status, del_flag, create_by, create_time, update_by, update_time, remark from exam_score
+        select e.score_id, e.course_id, c.course_name, e.score_name, e.score_file, e.score_size, e.status, e.del_flag, e.create_by, e.create_time, e.update_by, e.update_time, e.remark 
+        from exam_score e
+        left join course c on e.course_id = c.course_id
     </sql>
 
     <select id="selectExamScoreList" parameterType="ExamScore" resultMap="ExamScoreResult">
         <include refid="selectExamScoreVo"/>
         <where>  
-            del_flag = '0'
-            <if test="courseId != null "> and course_id = #{courseId}</if>
-            <if test="scoreName != null  and scoreName != ''"> and score_name like concat('%', #{scoreName}, '%')</if>
-            <if test="scoreFile != null  and scoreFile != ''"> and score_file = #{scoreFile}</if>
-            <if test="scoreSize != null "> and score_size = #{scoreSize}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+            e.del_flag = '0'
+            <if test="courseId != null "> and e.course_id = #{courseId}</if>
+            <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
+            <if test="scoreName != null  and scoreName != ''"> and e.score_name like concat('%', #{scoreName}, '%')</if>
+            <if test="scoreFile != null  and scoreFile != ''"> and e.score_file = #{scoreFile}</if>
+            <if test="scoreSize != null "> and e.score_size = #{scoreSize}</if>
+            <if test="status != null  and status != ''"> and e.status = #{status}</if>
         </where>
     </select>
     
     <select id="selectExamScoreByScoreId" parameterType="Long" resultMap="ExamScoreResult">
         <include refid="selectExamScoreVo"/>
-        where score_id = #{scoreId} and del_flag = '0'
+        where e.score_id = #{scoreId} and e.del_flag = '0'
     </select>
 
     <insert id="insertExamScore" parameterType="ExamScore" useGeneratedKeys="true" keyProperty="scoreId">

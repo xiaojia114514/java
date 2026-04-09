@@ -26,6 +26,10 @@ public class ScoreDetail extends BaseEntity
     @Excel(name = "课程ID")
     private Long courseId;
 
+    /** 课程名称 */
+    @Excel(name = "课程名称")
+    private String courseName;
+
     /** 文件名称 */
     @Excel(name = "文件名称")
     private String detailName;
@@ -73,6 +77,16 @@ public class ScoreDetail extends BaseEntity
     public Long getCourseId() 
     {
         return courseId;
+    }
+
+    public void setCourseName(String courseName) 
+    {
+        this.courseName = courseName;
+    }
+
+    public String getCourseName() 
+    {
+        return courseName;
     }
 
     public void setDetailName(String detailName) 
@@ -131,6 +145,7 @@ public class ScoreDetail extends BaseEntity
             .append("scoreDetailId", getScoreDetailId())
             .append("scoreId", getScoreId())
             .append("courseId", getCourseId())
+            .append("courseName", getCourseName())
             .append("detailName", getDetailName())
             .append("detailFile", getDetailFile())
             .append("detailSize", getDetailSize())

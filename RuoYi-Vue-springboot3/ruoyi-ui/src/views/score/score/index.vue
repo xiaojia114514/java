@@ -1,6 +1,14 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="课程名称" prop="courseName">
+        <el-input
+          v-model="queryParams.courseName"
+          placeholder="请输入课程名称"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="文件名称" prop="scoreName">
         <el-input
           v-model="queryParams.scoreName"
@@ -235,6 +243,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         courseId: null,
+        courseName: null,
         scoreName: null,
         scoreFile: null,
         scoreSize: null,

@@ -22,6 +22,10 @@ public class QualityReport extends BaseEntity
     @Excel(name = "课程ID")
     private Long courseId;
 
+    /** 课程名称 */
+    @Excel(name = "课程名称")
+    private String courseName;
+
     /** 报告名称 */
     @Excel(name = "报告名称")
     private String reportName;
@@ -55,6 +59,16 @@ public class QualityReport extends BaseEntity
     public Long getCourseId() 
     {
         return courseId;
+    }
+
+    public void setCourseName(String courseName) 
+    {
+        this.courseName = courseName;
+    }
+
+    public String getCourseName() 
+    {
+        return courseName;
     }
 
     public void setReportName(String reportName) 
@@ -102,6 +116,7 @@ public class QualityReport extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("reportId", getReportId())
             .append("courseId", getCourseId())
+            .append("courseName", getCourseName())
             .append("reportName", getReportName())
             .append("reportContent", getReportContent())
             .append("status", getStatus())

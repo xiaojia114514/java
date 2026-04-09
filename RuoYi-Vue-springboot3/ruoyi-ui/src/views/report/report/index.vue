@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="课程ID" prop="courseId">
+      <el-form-item label="课程名称" prop="courseName">
         <el-input
-          v-model="queryParams.courseId"
-          placeholder="请输入课程ID"
+          v-model="queryParams.courseName"
+          placeholder="请输入课程名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -72,7 +72,11 @@
     <el-table v-loading="loading" :data="reportList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="报告ID" align="center" prop="reportId" width="80" />
-      <el-table-column label="课程ID" align="center" prop="courseId" width="80" />
+      <el-table-column label="课程信息" align="center">
+        <template slot-scope="scope">
+          {{ getCourseInfo(scope.row.courseId) }}
+        </template>
+      </el-table-column>
       <el-table-column label="报告名称" align="center" prop="reportName" />
       <el-table-column label="报告内容" align="center" prop="reportContent" />
       <el-table-column label="状态" align="center" width="80">
@@ -118,8 +122,15 @@
     <!-- 添加或修改课程教学质量分析报告对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程ID" prop="courseId">
-          <el-input v-model="form.courseId" placeholder="请输入课程ID" />
+        <el-form-item label="课程信息" prop="courseId">
+          <el-select v-model="form.courseId" placeholder="请选择课程" clearable style="width: 100%">
+            <el-option
+              v-for="course in courseList"
+              :key="course.courseId"
+              :label="course.courseCode + ' - ' + course.courseName"
+              :value="course.courseId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="报告名称" prop="reportName">
           <el-input v-model="form.reportName" placeholder="请输入报告名称" />
@@ -146,8 +157,8 @@
     <!-- 查看课程教学质量分析报告详情对话框 -->
     <el-dialog title="查看课程教学质量分析报告" :visible.sync="viewOpen" width="500px" append-to-body>
       <el-form ref="viewForm" :model="viewForm" label-width="80px">
-        <el-form-item label="课程ID">
-          <el-input v-model="viewForm.courseId" disabled />
+        <el-form-item label="课程信息">
+          <el-input :value="getCourseInfo(viewForm.courseId)" disabled />
         </el-form-item>
         <el-form-item label="报告名称">
           <el-input v-model="viewForm.reportName" disabled />
@@ -171,6 +182,7 @@
 
 <script>
 import { listReport, getReport, delReport, addReport, updateReport } from "@/api/report/report"
+import { listCourse } from "@/api/course/course"
 
 export default {
   name: "Report",
@@ -190,6 +202,10 @@ export default {
       total: 0,
       // 课程教学质量分析报告表格数据
       reportList: [],
+      // 课程列表
+      courseList: [],
+      // 课程信息映射
+      courseMap: {},
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -203,6 +219,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         courseId: null,
+        courseName: null,
         reportName: null,
         reportContent: null,
         status: null,
@@ -222,8 +239,24 @@ export default {
   },
   created() {
     this.getList()
+    this.getCourseList()
   },
   methods: {
+    /** 查询课程列表 */
+    getCourseList() {
+      listCourse({ pageNum: 1, pageSize: 1000 }).then(response => {
+        this.courseList = response.rows
+        // 构建课程信息映射
+        this.courseMap = {}
+        response.rows.forEach(course => {
+          this.courseMap[course.courseId] = course.courseCode + ' - ' + course.courseName
+        })
+      })
+    },
+    /** 获取课程信息 */
+    getCourseInfo(courseId) {
+      return this.courseMap[courseId] || courseId
+    },
     /** 查看按钮操作 */
     handleView(row) {
       this.viewForm = { ...row }

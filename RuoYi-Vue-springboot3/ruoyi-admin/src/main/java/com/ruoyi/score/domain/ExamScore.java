@@ -22,6 +22,10 @@ public class ExamScore extends BaseEntity
     @Excel(name = "课程ID")
     private Long courseId;
 
+    /** 课程名称 */
+    @Excel(name = "课程名称")
+    private String courseName;
+
     /** 文件名称 */
     @Excel(name = "文件名称")
     private String scoreName;
@@ -59,6 +63,16 @@ public class ExamScore extends BaseEntity
     public Long getCourseId() 
     {
         return courseId;
+    }
+
+    public void setCourseName(String courseName) 
+    {
+        this.courseName = courseName;
+    }
+
+    public String getCourseName() 
+    {
+        return courseName;
     }
 
     public void setScoreName(String scoreName) 
@@ -116,6 +130,7 @@ public class ExamScore extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("scoreId", getScoreId())
             .append("courseId", getCourseId())
+            .append("courseName", getCourseName())
             .append("scoreName", getScoreName())
             .append("scoreFile", getScoreFile())
             .append("scoreSize", getScoreSize())

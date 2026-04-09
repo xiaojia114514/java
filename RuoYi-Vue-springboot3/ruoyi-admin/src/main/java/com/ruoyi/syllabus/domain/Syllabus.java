@@ -22,6 +22,10 @@ public class Syllabus extends BaseEntity
     @Excel(name = "课程ID", readConverterExp = "唯=一约束，允许为空")
     private Long courseId;
 
+    /** 课程名称 */
+    @Excel(name = "课程名称")
+    private String courseName;
+
     /** 文件名称 */
     @Excel(name = "文件名称")
     private String syllabusName;
@@ -59,6 +63,16 @@ public class Syllabus extends BaseEntity
     public Long getCourseId() 
     {
         return courseId;
+    }
+
+    public void setCourseName(String courseName) 
+    {
+        this.courseName = courseName;
+    }
+
+    public String getCourseName() 
+    {
+        return courseName;
     }
 
     public void setSyllabusName(String syllabusName) 
@@ -116,6 +130,7 @@ public class Syllabus extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("syllabusId", getSyllabusId())
             .append("courseId", getCourseId())
+            .append("courseName", getCourseName())
             .append("syllabusName", getSyllabusName())
             .append("syllabusFile", getSyllabusFile())
             .append("syllabusSize", getSyllabusSize())

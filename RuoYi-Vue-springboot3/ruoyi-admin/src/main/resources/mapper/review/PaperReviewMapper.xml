@@ -7,6 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="PaperReview" id="PaperReviewResult">
         <result property="reviewId"    column="review_id"    />
         <result property="courseId"    column="course_id"    />
+        <result property="courseName"    column="course_name"    />
         <result property="reviewName"    column="review_name"    />
         <result property="reviewFile"    column="review_file"    />
         <result property="reviewSize"    column="review_size"    />
@@ -20,24 +21,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectPaperReviewVo">
-        select review_id, course_id, review_name, review_file, review_size, status, del_flag, create_by, create_time, update_by, update_time, remark from paper_review
+        select p.review_id, p.course_id, c.course_name, p.review_name, p.review_file, p.review_size, p.status, p.del_flag, p.create_by, p.create_time, p.update_by, p.update_time, p.remark 
+        from paper_review p
+        left join course c on p.course_id = c.course_id
     </sql>
 
     <select id="selectPaperReviewList" parameterType="PaperReview" resultMap="PaperReviewResult">
         <include refid="selectPaperReviewVo"/>
         <where>  
-            del_flag = '0'
-            <if test="courseId != null "> and course_id = #{courseId}</if>
-            <if test="reviewName != null  and reviewName != ''"> and review_name like concat('%', #{reviewName}, '%')</if>
-            <if test="reviewFile != null  and reviewFile != ''"> and review_file = #{reviewFile}</if>
-            <if test="reviewSize != null "> and review_size = #{reviewSize}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+            p.del_flag = '0'
+            <if test="courseId != null "> and p.course_id = #{courseId}</if>
+            <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
+            <if test="reviewName != null  and reviewName != ''"> and p.review_name like concat('%', #{reviewName}, '%')</if>
+            <if test="reviewFile != null  and reviewFile != ''"> and p.review_file = #{reviewFile}</if>
+            <if test="reviewSize != null "> and p.review_size = #{reviewSize}</if>
+            <if test="status != null  and status != ''"> and p.status = #{status}</if>
         </where>
     </select>
     
     <select id="selectPaperReviewByReviewId" parameterType="Long" resultMap="PaperReviewResult">
         <include refid="selectPaperReviewVo"/>
-        where review_id = #{reviewId} and del_flag = '0'
+        where p.review_id = #{reviewId} and p.del_flag = '0'
     </select>
 
     <insert id="insertPaperReview" parameterType="PaperReview" useGeneratedKeys="true" keyProperty="reviewId">

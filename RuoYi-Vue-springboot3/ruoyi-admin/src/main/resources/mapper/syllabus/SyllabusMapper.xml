@@ -7,6 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="Syllabus" id="SyllabusResult">
         <result property="syllabusId"    column="syllabus_id"    />
         <result property="courseId"    column="course_id"    />
+        <result property="courseName"    column="course_name"    />
         <result property="syllabusName"    column="syllabus_name"    />
         <result property="syllabusFile"    column="syllabus_file"    />
         <result property="syllabusSize"    column="syllabus_size"    />
@@ -20,24 +21,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectSyllabusVo">
-        select syllabus_id, course_id, syllabus_name, syllabus_file, syllabus_size, status, del_flag, create_by, create_time, update_by, update_time, remark from syllabus
+        select s.syllabus_id, s.course_id, c.course_name, s.syllabus_name, s.syllabus_file, s.syllabus_size, s.status, s.del_flag, s.create_by, s.create_time, s.update_by, s.update_time, s.remark 
+        from syllabus s
+        left join course c on s.course_id = c.course_id
     </sql>
 
     <select id="selectSyllabusList" parameterType="Syllabus" resultMap="SyllabusResult">
         <include refid="selectSyllabusVo"/>
         <where>  
-            del_flag = '0'
-            <if test="courseId != null "> and course_id = #{courseId}</if>
-            <if test="syllabusName != null  and syllabusName != ''"> and syllabus_name like concat('%', #{syllabusName}, '%')</if>
-            <if test="syllabusFile != null  and syllabusFile != ''"> and syllabus_file = #{syllabusFile}</if>
-            <if test="syllabusSize != null "> and syllabus_size = #{syllabusSize}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+            s.del_flag = '0'
+            <if test="courseId != null "> and s.course_id = #{courseId}</if>
+            <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
+            <if test="syllabusName != null  and syllabusName != ''"> and s.syllabus_name like concat('%', #{syllabusName}, '%')</if>
+            <if test="syllabusFile != null  and syllabusFile != ''"> and s.syllabus_file = #{syllabusFile}</if>
+            <if test="syllabusSize != null "> and s.syllabus_size = #{syllabusSize}</if>
+            <if test="status != null  and status != ''"> and s.status = #{status}</if>
         </where>
     </select>
     
     <select id="selectSyllabusBySyllabusId" parameterType="Long" resultMap="SyllabusResult">
         <include refid="selectSyllabusVo"/>
-        where syllabus_id = #{syllabusId} and del_flag = '0'
+        where s.syllabus_id = #{syllabusId} and s.del_flag = '0'
     </select>
 
     <insert id="insertSyllabus" parameterType="Syllabus" useGeneratedKeys="true" keyProperty="syllabusId">
