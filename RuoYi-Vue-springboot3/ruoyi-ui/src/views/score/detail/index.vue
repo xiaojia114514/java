@@ -71,23 +71,33 @@
 
     <el-table v-loading="loading" :data="detailList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="细目表ID" align="center" prop="scoreDetailId" />
-      <el-table-column label="成绩单ID" align="center" prop="scoreId" />
+      <el-table-column label="细目表ID" align="center" prop="scoreDetailId" width="80" />
+      <el-table-column label="成绩单ID" align="center" prop="scoreId" width="80" />
       <el-table-column label="课程信息" align="center">
         <template slot-scope="scope">
           {{ getCourseInfo(scope.row.courseId) }}
         </template>
       </el-table-column>
       <el-table-column label="文件名称" align="center" prop="detailName" />
-      <el-table-column label="文件路径" align="center" prop="detailFile" />
-      <el-table-column label="文件大小" align="center" prop="detailSize">
+      <el-table-column label="文件路径" align="center" prop="detailFile" width="150" show-overflow-tooltip />
+      <el-table-column label="文件大小" align="center" width="100">
         <template slot-scope="scope">
           <span>{{ formatFileSize(scope.row.detailSize) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="状态" align="center" width="80">
         <template slot-scope="scope">
+          {{ scope.row.status === '0' ? '正常' : '停用' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="240" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleView(scope.row)"
+          >查看</el-button>
           <el-button
             size="mini"
             type="text"
@@ -145,11 +155,43 @@
         <el-form-item label="文件大小" prop="detailSize">
           <el-input v-model="formattedDetailSize" placeholder="请选择文件" readonly disabled />
         </el-form-item>
-
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio label="0">正常</el-radio>
+            <el-radio label="1">停用</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 查看成绩细目详情对话框 -->
+    <el-dialog title="查看成绩细目" :visible.sync="viewOpen" width="500px" append-to-body>
+      <el-form ref="viewForm" :model="viewForm" label-width="80px">
+        <el-form-item label="成绩单ID">
+          <el-input v-model="viewForm.scoreId" disabled />
+        </el-form-item>
+        <el-form-item label="课程信息">
+          <el-input :value="getCourseInfo(viewForm.courseId)" disabled />
+        </el-form-item>
+        <el-form-item label="文件名称">
+          <el-input v-model="viewForm.detailName" disabled />
+        </el-form-item>
+        <el-form-item label="文件路径">
+          <el-input v-model="viewForm.detailFile" disabled />
+        </el-form-item>
+        <el-form-item label="文件大小">
+          <el-input :value="formatFileSize(viewForm.detailSize)" disabled />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-input :value="viewForm.status === '0' ? '正常' : '停用'" disabled />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="viewOpen = false">关 闭</el-button>
       </div>
     </el-dialog>
   </div>
@@ -186,6 +228,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示查看弹出层
+      viewOpen: false,
+      // 查看表单参数
+      viewForm: {},
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -275,6 +321,11 @@ export default {
         this.form.detailName = ''
       }
     },
+    /** 查看按钮操作 */
+    handleView(row) {
+      this.viewForm = { ...row }
+      this.viewOpen = true
+    },
     /** 查询成绩细目列表 */
     getList() {
       this.loading = true
@@ -298,7 +349,7 @@ export default {
         detailName: null,
         detailFile: null,
         detailSize: null,
-        status: null,
+        status: "0",
         createTime: null,
         updateTime: null
       }

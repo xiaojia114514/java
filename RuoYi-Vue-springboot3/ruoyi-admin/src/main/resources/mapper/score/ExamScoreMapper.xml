@@ -88,14 +88,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where score_id = #{scoreId}
     </update>
 
-    <delete id="deleteExamScoreByScoreId" parameterType="Long">
-        delete from exam_score where score_id = #{scoreId}
-    </delete>
+    <update id="deleteExamScoreByScoreId" parameterType="Long">
+        update exam_score set del_flag = '2' where score_id = #{scoreId}
+    </update>
 
-    <delete id="deleteExamScoreByScoreIds" parameterType="String">
-        delete from exam_score where score_id in 
+    <update id="deleteExamScoreByScoreIds" parameterType="String">
+        update exam_score set del_flag = '2' where score_id in 
         <foreach item="scoreId" collection="array" open="(" separator="," close=")">
             #{scoreId}
         </foreach>
-    </delete>
+    </update>
 </mapper>

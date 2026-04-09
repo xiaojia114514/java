@@ -108,14 +108,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where course_id = #{courseId}
     </update>
 
-    <delete id="deleteCourseByCourseId" parameterType="Long">
-        delete from course where course_id = #{courseId}
-    </delete>
+    <update id="deleteCourseByCourseId" parameterType="Long">
+        update course set del_flag = '2' where course_id = #{courseId}
+    </update>
 
-    <delete id="deleteCourseByCourseIds" parameterType="String">
-        delete from course where course_id in 
+    <update id="deleteCourseByCourseIds" parameterType="String">
+        update course set del_flag = '2' where course_id in 
         <foreach item="courseId" collection="array" open="(" separator="," close=")">
             #{courseId}
         </foreach>
-    </delete>
+    </update>
 </mapper>

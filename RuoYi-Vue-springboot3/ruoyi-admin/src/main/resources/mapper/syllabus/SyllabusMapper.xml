@@ -88,14 +88,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where syllabus_id = #{syllabusId}
     </update>
 
-    <delete id="deleteSyllabusBySyllabusId" parameterType="Long">
-        delete from syllabus where syllabus_id = #{syllabusId}
-    </delete>
+    <update id="deleteSyllabusBySyllabusId" parameterType="Long">
+        update syllabus set del_flag = '2' where syllabus_id = #{syllabusId}
+    </update>
 
-    <delete id="deleteSyllabusBySyllabusIds" parameterType="String">
-        delete from syllabus where syllabus_id in 
+    <update id="deleteSyllabusBySyllabusIds" parameterType="String">
+        update syllabus set del_flag = '2' where syllabus_id in 
         <foreach item="syllabusId" collection="array" open="(" separator="," close=")">
             #{syllabusId}
         </foreach>
-    </delete>
+    </update>
 </mapper>

@@ -111,19 +111,29 @@
 
     <el-table v-loading="loading" :data="courseList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="课程ID" align="center" prop="courseId" />
+      <el-table-column label="课程ID" align="center" prop="courseId" width="80" />
       <el-table-column label="课程代码" align="center" prop="courseCode" />
       <el-table-column label="课程名称" align="center" prop="courseName" />
       <el-table-column label="英文名称" align="center" prop="courseEnglishName" />
       <el-table-column label="课程性质" align="center" prop="courseNature" />
-      <el-table-column label="学时" align="center" prop="totalHours" />
-      <el-table-column label="学分" align="center" prop="credit" />
-      <el-table-column label="开课学期" align="center" prop="semester" />
+      <el-table-column label="学时" align="center" prop="totalHours" width="80" />
+      <el-table-column label="学分" align="center" prop="credit" width="80" />
+      <el-table-column label="开课学期" align="center" prop="semester" width="80" />
       <el-table-column label="授课班级" align="center" prop="className" />
-      <el-table-column label="状态" align="center" prop="status" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="状态" align="center" width="80">
         <template slot-scope="scope">
+          {{ scope.row.status === '0' ? '正常' : '停用' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" width="120" show-overflow-tooltip />
+      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleView(scope.row)"
+          >查看</el-button>
           <el-button
             size="mini"
             type="text"
@@ -174,7 +184,12 @@
         <el-form-item label="授课班级" prop="className">
           <el-input v-model="form.className" placeholder="请输入授课班级" />
         </el-form-item>
-
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio label="0">正常</el-radio>
+            <el-radio label="1">停用</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -182,6 +197,42 @@
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 查看课程管理详情对话框 -->
+    <el-dialog title="查看课程管理" :visible.sync="viewOpen" width="500px" append-to-body>
+      <el-form ref="viewForm" :model="viewForm" label-width="80px">
+        <el-form-item label="课程代码">
+          <el-input v-model="viewForm.courseCode" disabled />
+        </el-form-item>
+        <el-form-item label="课程名称">
+          <el-input v-model="viewForm.courseName" disabled />
+        </el-form-item>
+        <el-form-item label="英文名称">
+          <el-input v-model="viewForm.courseEnglishName" disabled />
+        </el-form-item>
+        <el-form-item label="学时">
+          <el-input v-model="viewForm.totalHours" disabled />
+        </el-form-item>
+        <el-form-item label="学分">
+          <el-input v-model="viewForm.credit" disabled />
+        </el-form-item>
+        <el-form-item label="开课学期">
+          <el-input v-model="viewForm.semester" disabled />
+        </el-form-item>
+        <el-form-item label="授课班级">
+          <el-input v-model="viewForm.className" disabled />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-input :value="viewForm.status === '0' ? '正常' : '停用'" disabled />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="viewForm.remark" type="textarea" disabled />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="viewOpen = false">关 闭</el-button>
       </div>
     </el-dialog>
   </div>
@@ -212,6 +263,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示查看弹出层
+      viewOpen: false,
+      // 查看表单参数
+      viewForm: {},
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -269,7 +324,7 @@ export default {
         credit: null,
         semester: null,
         className: null,
-        status: null,
+        status: "0",
         createBy: null,
         createTime: null,
         updateBy: null,
@@ -293,6 +348,11 @@ export default {
       this.ids = selection.map(item => item.courseId)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    /** 查看按钮操作 */
+    handleView(row) {
+      this.viewForm = { ...row }
+      this.viewOpen = true
     },
     /** 新增按钮操作 */
     handleAdd() {

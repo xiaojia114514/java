@@ -88,14 +88,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where review_id = #{reviewId}
     </update>
 
-    <delete id="deletePaperReviewByReviewId" parameterType="Long">
-        delete from paper_review where review_id = #{reviewId}
-    </delete>
+    <update id="deletePaperReviewByReviewId" parameterType="Long">
+        update paper_review set del_flag = '2' where review_id = #{reviewId}
+    </update>
 
-    <delete id="deletePaperReviewByReviewIds" parameterType="String">
-        delete from paper_review where review_id in 
+    <update id="deletePaperReviewByReviewIds" parameterType="String">
+        update paper_review set del_flag = '2' where review_id in 
         <foreach item="reviewId" collection="array" open="(" separator="," close=")">
             #{reviewId}
         </foreach>
-    </delete>
+    </update>
 </mapper>
