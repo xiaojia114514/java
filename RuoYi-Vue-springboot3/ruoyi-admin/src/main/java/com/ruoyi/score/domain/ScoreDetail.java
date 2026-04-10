@@ -42,9 +42,9 @@ public class ScoreDetail extends BaseEntity
     @Excel(name = "文件大小")
     private Long detailSize;
 
-    /** 解析任务ID */
-    @Excel(name = "解析任务ID")
-    private Long scoreDetailTaskId;
+    /** 解析内容 */
+    @Excel(name = "解析内容")
+    private String parseContent;
 
     /** 状态（0正常 1停用） */
     @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
@@ -123,14 +123,14 @@ public class ScoreDetail extends BaseEntity
         return detailSize;
     }
 
-    public void setScoreDetailTaskId(Long scoreDetailTaskId) 
+    public void setParseContent(String parseContent) 
     {
-        this.scoreDetailTaskId = scoreDetailTaskId;
+        this.parseContent = parseContent;
     }
 
-    public Long getScoreDetailTaskId() 
+    public String getParseContent() 
     {
-        return scoreDetailTaskId;
+        return parseContent;
     }
 
     public void setStatus(String status) 
@@ -163,7 +163,7 @@ public class ScoreDetail extends BaseEntity
             .append("detailName", getDetailName())
             .append("detailFile", getDetailFile())
             .append("detailSize", getDetailSize())
-            .append("scoreDetailTaskId", getScoreDetailTaskId())
+            .append("parseContent", getParseContent())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
             .append("createTime", getCreateTime())

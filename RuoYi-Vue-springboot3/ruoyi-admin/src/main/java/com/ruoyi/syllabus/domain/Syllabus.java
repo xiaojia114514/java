@@ -38,9 +38,9 @@ public class Syllabus extends BaseEntity
     @Excel(name = "文件大小")
     private Long syllabusSize;
 
-    /** 解析任务ID */
-    @Excel(name = "解析任务ID")
-    private Long syllabusTaskId;
+    /** 解析内容 */
+    @Excel(name = "解析内容")
+    private String parseContent;
 
     /** 状态（0正常 1停用） */
     @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
@@ -109,14 +109,14 @@ public class Syllabus extends BaseEntity
         return syllabusSize;
     }
 
-    public void setSyllabusTaskId(Long syllabusTaskId) 
+    public void setParseContent(String parseContent) 
     {
-        this.syllabusTaskId = syllabusTaskId;
+        this.parseContent = parseContent;
     }
 
-    public Long getSyllabusTaskId() 
+    public String getParseContent() 
     {
-        return syllabusTaskId;
+        return parseContent;
     }
 
     public void setStatus(String status) 
@@ -148,7 +148,7 @@ public class Syllabus extends BaseEntity
             .append("syllabusName", getSyllabusName())
             .append("syllabusFile", getSyllabusFile())
             .append("syllabusSize", getSyllabusSize())
-            .append("syllabusTaskId", getSyllabusTaskId())
+            .append("parseContent", getParseContent())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())

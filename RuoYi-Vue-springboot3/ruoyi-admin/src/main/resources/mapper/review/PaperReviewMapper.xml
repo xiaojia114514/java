@@ -11,7 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="reviewName"    column="review_name"    />
         <result property="reviewFile"    column="review_file"    />
         <result property="reviewSize"    column="review_size"    />
-        <result property="paperReviewTaskId"    column="paper_review_task_id"    />
+        <result property="parseContent"    column="parse_content"    />
         <result property="status"    column="status"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectPaperReviewVo">
-        select p.review_id, p.course_id, c.course_name, p.review_name, p.review_file, p.review_size, p.paper_review_task_id, p.status, p.del_flag, p.create_by, p.create_time, p.update_by, p.update_time, p.remark 
+        select p.review_id, p.course_id, c.course_name, p.review_name, p.review_file, p.review_size, p.parse_content, p.status, p.del_flag, p.create_by, p.create_time, p.update_by, p.update_time, p.remark 
         from paper_review p
         left join course c on p.course_id = c.course_id
     </sql>
@@ -52,7 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reviewName != null and reviewName != ''">review_name,</if>
             <if test="reviewFile != null and reviewFile != ''">review_file,</if>
             <if test="reviewSize != null">review_size,</if>
-            <if test="paperReviewTaskId != null">paper_review_task_id,</if>
+            <if test="parseContent != null">parse_content,</if>
             <if test="status != null">status,</if>
             <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
@@ -66,7 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reviewName != null and reviewName != ''">#{reviewName},</if>
             <if test="reviewFile != null and reviewFile != ''">#{reviewFile},</if>
             <if test="reviewSize != null">#{reviewSize},</if>
-            <if test="paperReviewTaskId != null">#{paperReviewTaskId},</if>
+            <if test="parseContent != null">#{parseContent},</if>
             <if test="status != null">#{status},</if>
             <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reviewName != null and reviewName != ''">review_name = #{reviewName},</if>
             <if test="reviewFile != null and reviewFile != ''">review_file = #{reviewFile},</if>
             <if test="reviewSize != null">review_size = #{reviewSize},</if>
-            <if test="paperReviewTaskId != null">paper_review_task_id = #{paperReviewTaskId},</if>
+            <if test="parseContent != null">parse_content = #{parseContent},</if>
             <if test="status != null">status = #{status},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>

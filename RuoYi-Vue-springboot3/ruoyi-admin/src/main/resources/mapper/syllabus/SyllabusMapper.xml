@@ -11,7 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="syllabusName"    column="syllabus_name"    />
         <result property="syllabusFile"    column="syllabus_file"    />
         <result property="syllabusSize"    column="syllabus_size"    />
-        <result property="syllabusTaskId"    column="syllabus_task_id"    />
+        <result property="parseContent"    column="parse_content"    />
         <result property="status"    column="status"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectSyllabusVo">
-        select s.syllabus_id, s.course_id, c.course_name, s.syllabus_name, s.syllabus_file, s.syllabus_size, s.syllabus_task_id, s.status, s.del_flag, s.create_by, s.create_time, s.update_by, s.update_time, s.remark 
+        select s.syllabus_id, s.course_id, c.course_name, s.syllabus_name, s.syllabus_file, s.syllabus_size, s.parse_content, s.status, s.del_flag, s.create_by, s.create_time, s.update_by, s.update_time, s.remark 
         from syllabus s
         left join course c on s.course_id = c.course_id
     </sql>
@@ -52,7 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="syllabusName != null and syllabusName != ''">syllabus_name,</if>
             <if test="syllabusFile != null and syllabusFile != ''">syllabus_file,</if>
             <if test="syllabusSize != null">syllabus_size,</if>
-            <if test="syllabusTaskId != null">syllabus_task_id,</if>
+            <if test="parseContent != null">parse_content,</if>
             <if test="status != null">status,</if>
             <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
@@ -66,7 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="syllabusName != null and syllabusName != ''">#{syllabusName},</if>
             <if test="syllabusFile != null and syllabusFile != ''">#{syllabusFile},</if>
             <if test="syllabusSize != null">#{syllabusSize},</if>
-            <if test="syllabusTaskId != null">#{syllabusTaskId},</if>
+            <if test="parseContent != null">#{parseContent},</if>
             <if test="status != null">#{status},</if>
             <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="syllabusName != null and syllabusName != ''">syllabus_name = #{syllabusName},</if>
             <if test="syllabusFile != null and syllabusFile != ''">syllabus_file = #{syllabusFile},</if>
             <if test="syllabusSize != null">syllabus_size = #{syllabusSize},</if>
-            <if test="syllabusTaskId != null">syllabus_task_id = #{syllabusTaskId},</if>
+            <if test="parseContent != null">parse_content = #{parseContent},</if>
             <if test="status != null">status = #{status},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>

@@ -8,7 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="reportTemplateName"  column="report_template_name"   />
         <result property="reportTemplateFile"  column="report_template_file"   />
         <result property="reportTemplateSize"  column="report_template_size"   />
-        <result property="reportTemplateTaskId"  column="report_template_task_id"   />
+        <result property="parseContent"  column="parse_content"   />
         <result property="status"  column="status"   />
         <result property="delFlag"  column="del_flag"   />
         <result property="createBy"  column="create_by"   />
@@ -19,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectQualityReportTemplateVo">
-        select report_template_id, report_template_name, report_template_file, report_template_size, report_template_task_id, status, del_flag, create_by, create_time, update_by, update_time, remark 
+        select report_template_id, report_template_name, report_template_file, report_template_size, parse_content, status, del_flag, create_by, create_time, update_by, update_time, remark 
         from quality_report_template
         where del_flag = '0'
     </sql>
@@ -47,7 +47,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reportTemplateName != null">report_template_name,</if>
             <if test="reportTemplateFile != null">report_template_file,</if>
             <if test="reportTemplateSize != null">report_template_size,</if>
-            <if test="reportTemplateTaskId != null">report_template_task_id,</if>
+            <if test="parseContent != null">parse_content,</if>
             <if test="status != null">status,</if>
             <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
@@ -60,7 +60,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reportTemplateName != null">#{reportTemplateName},</if>
             <if test="reportTemplateFile != null">#{reportTemplateFile},</if>
             <if test="reportTemplateSize != null">#{reportTemplateSize},</if>
-            <if test="reportTemplateTaskId != null">#{reportTemplateTaskId},</if>
+            <if test="parseContent != null">#{parseContent},</if>
             <if test="status != null">#{status},</if>
             <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -77,7 +77,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reportTemplateName != null">report_template_name = #{reportTemplateName},</if>
             <if test="reportTemplateFile != null">report_template_file = #{reportTemplateFile},</if>
             <if test="reportTemplateSize != null">report_template_size = #{reportTemplateSize},</if>
-            <if test="reportTemplateTaskId != null">report_template_task_id = #{reportTemplateTaskId},</if>
+            <if test="parseContent != null">parse_content = #{parseContent},</if>
             <if test="status != null">status = #{status},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
