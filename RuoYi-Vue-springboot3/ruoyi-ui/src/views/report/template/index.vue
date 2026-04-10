@@ -1,21 +1,23 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="课程名称" prop="courseName">
+      <el-form-item label="模板名称" prop="reportTemplateName">
         <el-input
-          v-model="queryParams.courseName"
-          placeholder="请输入课程名称"
+          v-model="queryParams.reportTemplateName"
+          placeholder="请输入模板名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="报告名称" prop="reportName">
-        <el-input
-          v-model="queryParams.reportName"
-          placeholder="请输入报告名称"
+      <el-form-item label="状态" prop="status">
+        <el-select
+          v-model="queryParams.status"
+          placeholder="请选择状态"
           clearable
-          @keyup.enter.native="handleQuery"
-        />
+        >
+          <el-option label="正常" value="0" />
+          <el-option label="停用" value="1" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -31,7 +33,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['report:report:add']"
+          v-hasPermi="['report:template:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -42,7 +44,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['report:report:edit']"
+          v-hasPermi="['report:template:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -53,7 +55,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['report:report:remove']"
+          v-hasPermi="['report:template:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -63,22 +65,22 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['report:report:export']"
+          v-hasPermi="['report:template:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="reportList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="templateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="报告ID" align="center" prop="reportId" width="80" />
-      <el-table-column label="课程信息" align="center">
+      <el-table-column label="模板ID" align="center" prop="reportTemplateId" width="100" />
+      <el-table-column label="模板名称" align="center" prop="reportTemplateName" />
+      <el-table-column label="文件路径" align="center" prop="reportTemplateFile" show-overflow-tooltip />
+      <el-table-column label="文件大小" align="center" prop="reportTemplateSize" width="120">
         <template slot-scope="scope">
-          {{ getCourseInfo(scope.row.courseId) }}
+          {{ formatFileSize(scope.row.reportTemplateSize) }}
         </template>
       </el-table-column>
-      <el-table-column label="报告名称" align="center" prop="reportName" />
-      <el-table-column label="报告内容" align="center" prop="reportContent" />
       <el-table-column label="状态" align="center" width="80">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
@@ -86,8 +88,15 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="是否解析" align="center" width="80">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.reportTemplateTaskId ? 'success' : 'warning'">
+            {{ scope.row.reportTemplateTaskId ? '已解析' : '未解析' }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" width="120" show-overflow-tooltip />
-      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="240" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -100,15 +109,21 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['report:report:edit']"
+            v-hasPermi="['report:template:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['report:report:remove']"
+            v-hasPermi="['report:template:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-download"
+            @click="handleDownload(scope.row)"
+          >下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,24 +136,20 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改课程教学质量分析报告对话框 -->
+    <!-- 添加或修改课程教学质量分析报告模板管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程信息" prop="courseId">
-          <el-select v-model="form.courseId" placeholder="请选择课程" clearable style="width: 100%">
-            <el-option
-              v-for="course in courseList"
-              :key="course.courseId"
-              :label="course.courseCode + ' - ' + course.courseName"
-              :value="course.courseId"
-            />
-          </el-select>
+        <el-form-item label="模板名称" prop="reportTemplateName">
+          <el-input v-model="form.reportTemplateName" placeholder="请输入模板名称" />
         </el-form-item>
-        <el-form-item label="报告名称" prop="reportName">
-          <el-input v-model="form.reportName" placeholder="请输入报告名称" />
+        <el-form-item label="文件路径" prop="reportTemplateFile">
+          <file-upload 
+            v-model="form.reportTemplateFile" 
+            @change="handleFileChange" 
+          />
         </el-form-item>
-        <el-form-item label="报告内容">
-          <editor v-model="form.reportContent" :min-height="192"/>
+        <el-form-item label="文件大小" prop="reportTemplateSize">
+          <el-input v-model="formattedReportTemplateSize" placeholder="请选择文件" disabled />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -156,17 +167,17 @@
       </div>
     </el-dialog>
 
-    <!-- 查看课程教学质量分析报告详情对话框 -->
-    <el-dialog title="查看课程教学质量分析报告" :visible.sync="viewOpen" width="500px" append-to-body>
+    <!-- 查看课程教学质量分析报告模板管理对话框 -->
+    <el-dialog title="查看模板详情" :visible.sync="viewOpen" width="500px" append-to-body>
       <el-form ref="viewForm" :model="viewForm" label-width="80px">
-        <el-form-item label="课程信息">
-          <el-input :value="getCourseInfo(viewForm.courseId)" disabled />
+        <el-form-item label="模板名称">
+          <el-input v-model="viewForm.reportTemplateName" disabled />
         </el-form-item>
-        <el-form-item label="报告名称">
-          <el-input v-model="viewForm.reportName" disabled />
+        <el-form-item label="文件路径">
+          <el-input v-model="viewForm.reportTemplateFile" disabled />
         </el-form-item>
-        <el-form-item label="报告内容">
-          <el-input v-model="viewForm.reportContent" type="textarea" disabled />
+        <el-form-item label="文件大小">
+          <el-input :value="formatFileSize(viewForm.reportTemplateSize)" disabled />
         </el-form-item>
         <el-form-item label="状态">
           <el-input :value="viewForm.status === '0' ? '正常' : '停用'" disabled />
@@ -183,11 +194,11 @@
 </template>
 
 <script>
-import { listReport, getReport, delReport, addReport, updateReport } from "@/api/report/report"
-import { listCourse } from "@/api/course/course"
+import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } from "@/api/report/template"
+import download from '@/plugins/download'
 
 export default {
-  name: "Report",
+  name: "Template",
   data() {
     return {
       // 遮罩层
@@ -202,12 +213,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 课程教学质量分析报告表格数据
-      reportList: [],
-      // 课程列表
-      courseList: [],
-      // 课程信息映射
-      courseMap: {},
+      // 课程教学质量分析报告模板管理表格数据
+      templateList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -220,55 +227,47 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        courseId: null,
-        courseName: null,
-        reportName: null,
-        reportContent: null,
+        reportTemplateName: null,
         status: null,
       },
       // 表单参数
-      form: {},
+      form: {
+        reportTemplateId: null,
+        reportTemplateName: null,
+        reportTemplateFile: null,
+        reportTemplateSize: null,
+        status: "0",
+        remark: null
+      },
       // 表单校验
       rules: {
-        courseId: [
-          { required: true, message: "课程ID不能为空", trigger: "blur" }
+        reportTemplateName: [
+          { required: true, message: "报告模板名称不能为空", trigger: "blur" }
         ],
-        reportName: [
-          { required: true, message: "报告名称不能为空", trigger: "blur" }
+        reportTemplateFile: [
+          { required: true, message: "文件路径不能为空", trigger: "blur" }
         ],
+        status: [
+          { required: true, message: "状态不能为空", trigger: "blur" }
+        ]
       }
+    }
+  },
+  computed: {
+    // 格式化文件大小
+    formattedReportTemplateSize() {
+      return this.formatFileSize(this.form.reportTemplateSize)
     }
   },
   created() {
     this.getList()
-    this.getCourseList()
   },
   methods: {
-    /** 查询课程列表 */
-    getCourseList() {
-      listCourse({ pageNum: 1, pageSize: 1000 }).then(response => {
-        this.courseList = response.rows
-        // 构建课程信息映射
-        this.courseMap = {}
-        response.rows.forEach(course => {
-          this.courseMap[course.courseId] = course.courseCode + ' - ' + course.courseName
-        })
-      })
-    },
-    /** 获取课程信息 */
-    getCourseInfo(courseId) {
-      return this.courseMap[courseId] || courseId
-    },
-    /** 查看按钮操作 */
-    handleView(row) {
-      this.viewForm = { ...row }
-      this.viewOpen = true
-    },
-    /** 查询课程教学质量分析报告列表 */
+    /** 查询课程教学质量分析报告模板管理列表 */
     getList() {
       this.loading = true
-      listReport(this.queryParams).then(response => {
-        this.reportList = response.rows
+      listTemplate(this.queryParams).then(response => {
+        this.templateList = response.rows
         this.total = response.total
         this.loading = false
       })
@@ -281,15 +280,11 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        reportId: null,
-        courseId: null,
-        reportName: null,
-        reportContent: null,
+        reportTemplateId: null,
+        reportTemplateName: null,
+        reportTemplateFile: null,
+        reportTemplateSize: null,
         status: "0",
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null,
         remark: null
       }
       this.resetForm("form")
@@ -306,7 +301,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.reportId)
+      this.ids = selection.map(item => item.reportTemplateId)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -314,30 +309,35 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = "添加课程教学质量分析报告"
+      this.title = "添加课程教学质量分析报告模板管理"
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      const reportId = row.reportId || this.ids
-      getReport(reportId).then(response => {
+      const reportTemplateId = row.reportTemplateId || this.ids
+      getTemplate(reportTemplateId).then(response => {
         this.form = response.data
         this.open = true
-        this.title = "修改课程教学质量分析报告"
+        this.title = "修改课程教学质量分析报告模板管理"
       })
+    },
+    /** 查看按钮操作 */
+    handleView(row) {
+      this.viewForm = { ...row }
+      this.viewOpen = true
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.reportId != null) {
-            updateReport(this.form).then(response => {
+          if (this.form.reportTemplateId != null) {
+            updateTemplate(this.form).then(response => {
               this.$modal.msgSuccess("修改成功")
               this.open = false
               this.getList()
             })
           } else {
-            addReport(this.form).then(response => {
+            addTemplate(this.form).then(response => {
               this.$modal.msgSuccess("新增成功")
               this.open = false
               this.getList()
@@ -348,9 +348,9 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const reportIds = row.reportId || this.ids
-      this.$modal.confirm('是否确认删除课程教学质量分析报告编号为"' + reportIds + '"的数据项？').then(function() {
-        return delReport(reportIds)
+      const reportTemplateIds = row.reportTemplateId || this.ids
+      this.$modal.confirm('是否确认删除课程教学质量分析报告模板管理编号为"' + reportTemplateIds + '"的数据项？').then(function() {
+        return delTemplate(reportTemplateIds)
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess("删除成功")
@@ -358,9 +358,48 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('report/report/export', {
+      this.download('report/template/export', {
         ...this.queryParams
-      }, `report_${new Date().getTime()}.xlsx`)
+      }, `template_${new Date().getTime()}.xlsx`)
+    },
+    /** 下载文件 */
+    handleDownload(row) {
+      if (row.reportTemplateFile) {
+        // 下载文件，使用download插件
+        download.resource(row.reportTemplateFile)
+      }
+    },
+    /** 文件上传后处理 */
+    handleFileChange(fileData) {
+      if (fileData) {
+        // 从file-upload组件传递的对象中获取数据
+        if (fileData.name) {
+          // 使用文件名称作为模板名称（去除扩展名）
+          const templateName = fileData.name.substring(0, fileData.name.lastIndexOf('.'))
+          this.form.reportTemplateName = templateName
+        }
+        
+        if (fileData.size) {
+          // 设置文件大小（原始字节数）
+          this.form.reportTemplateSize = fileData.size
+        }
+      } else {
+        // 清空文件信息
+        this.form.reportTemplateSize = null
+        this.form.reportTemplateName = ''
+      }
+    },
+    /** 格式化文件大小 */
+    formatFileSize(size) {
+      if (!size || size === 0) return ''
+      const units = ['B', 'KB', 'MB', 'GB']
+      let index = 0
+      let fileSize = size
+      while (fileSize >= 1024 && index < units.length - 1) {
+        fileSize /= 1024
+        index++
+      }
+      return fileSize.toFixed(2) + ' ' + units[index]
     }
   }
 }

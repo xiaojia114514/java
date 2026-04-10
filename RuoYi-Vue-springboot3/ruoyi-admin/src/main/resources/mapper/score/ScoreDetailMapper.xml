@@ -12,6 +12,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="detailName"    column="detail_name"    />
         <result property="detailFile"    column="detail_file"    />
         <result property="detailSize"    column="detail_size"    />
+        <result property="scoreDetailTaskId"    column="score_detail_task_id"    />
         <result property="status"    column="status"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="createTime"    column="create_time"    />
@@ -19,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectScoreDetailVo">
-        select s.score_detail_id, s.score_id, s.course_id, c.course_name, s.detail_name, s.detail_file, s.detail_size, s.status, s.del_flag, s.create_time, s.update_time 
+        select s.score_detail_id, s.score_id, s.course_id, c.course_name, s.detail_name, s.detail_file, s.detail_size, s.score_detail_task_id, s.status, s.del_flag, s.create_time, s.update_time 
         from score_detail s
         left join course c on s.course_id = c.course_id
     </sql>
@@ -51,6 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="detailName != null and detailName != ''">detail_name,</if>
             <if test="detailFile != null and detailFile != ''">detail_file,</if>
             <if test="detailSize != null">detail_size,</if>
+            <if test="scoreDetailTaskId != null">score_detail_task_id,</if>
             <if test="status != null">status,</if>
             <if test="delFlag != null">del_flag,</if>
             <if test="createTime != null">create_time,</if>
@@ -62,6 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="detailName != null and detailName != ''">#{detailName},</if>
             <if test="detailFile != null and detailFile != ''">#{detailFile},</if>
             <if test="detailSize != null">#{detailSize},</if>
+            <if test="scoreDetailTaskId != null">#{scoreDetailTaskId},</if>
             <if test="status != null">#{status},</if>
             <if test="delFlag != null">#{delFlag},</if>
             <if test="createTime != null">#{createTime},</if>
@@ -77,6 +80,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="detailName != null and detailName != ''">detail_name = #{detailName},</if>
             <if test="detailFile != null and detailFile != ''">detail_file = #{detailFile},</if>
             <if test="detailSize != null">detail_size = #{detailSize},</if>
+            <if test="scoreDetailTaskId != null">score_detail_task_id = #{scoreDetailTaskId},</if>
             <if test="status != null">status = #{status},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createTime != null">create_time = #{createTime},</if>

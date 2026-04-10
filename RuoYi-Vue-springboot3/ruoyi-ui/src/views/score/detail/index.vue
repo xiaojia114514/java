@@ -95,7 +95,16 @@
       </el-table-column>
       <el-table-column label="状态" align="center" width="80">
         <template slot-scope="scope">
-          {{ scope.row.status === '0' ? '正常' : '停用' }}
+          <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
+            {{ scope.row.status === '0' ? '正常' : '停用' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否解析" align="center" width="80">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.scoreDetailTaskId ? 'success' : 'warning'">
+            {{ scope.row.scoreDetailTaskId ? '已解析' : '未解析' }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="240" class-name="small-padding fixed-width">
