@@ -9,13 +9,20 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="成绩单ID" prop="scoreId">
-        <el-input
+      <el-form-item label="关联成绩单" prop="scoreId">
+        <el-select
           v-model="queryParams.scoreId"
-          placeholder="请输入成绩单ID"
+          placeholder="请选择关联成绩单"
           clearable
-          @keyup.enter.native="handleQuery"
-        />
+          style="width: 200px"
+        >
+          <el-option
+            v-for="score in scoreList"
+            :key="score.scoreId"
+            :label="score.scoreName"
+            :value="score.scoreId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="文件名称" prop="detailName">
         <el-input
@@ -80,7 +87,11 @@
     <el-table v-loading="loading" :data="detailList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="细目表ID" align="center" prop="scoreDetailId" width="80" />
-      <el-table-column label="成绩单ID" align="center" prop="scoreId" width="80" />
+      <el-table-column label="关联成绩单" align="center" width="150">
+        <template slot-scope="scope">
+          {{ getScoreName(scope.row.scoreId) }}
+        </template>
+      </el-table-column>
       <el-table-column label="课程信息" align="center">
         <template slot-scope="scope">
           {{ getCourseInfo(scope.row.courseId) }}
@@ -150,11 +161,18 @@
     <!-- 添加或修改成绩细目对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="成绩单ID" prop="scoreId">
-          <el-input v-model="form.scoreId" placeholder="请输入成绩单ID" />
+        <el-form-item label="关联成绩单" prop="scoreId">
+          <el-select v-model="form.scoreId" placeholder="请选择关联成绩单" style="width: 100%" @change="handleScoreChange">
+            <el-option
+              v-for="score in scoreList"
+              :key="score.scoreId"
+              :label="score.scoreName"
+              :value="score.scoreId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="课程信息" prop="courseId">
-          <el-select v-model="form.courseId" placeholder="请选择课程" style="width: 100%">
+          <el-select v-model="form.courseId" placeholder="请选择关联成绩单" style="width: 100%" disabled>
             <el-option
               v-for="course in courseList"
               :key="course.courseId"
@@ -188,8 +206,8 @@
     <!-- 查看成绩细目详情对话框 -->
     <el-dialog title="查看成绩细目" :visible.sync="viewOpen" width="500px" append-to-body>
       <el-form ref="viewForm" :model="viewForm" label-width="80px">
-        <el-form-item label="成绩单ID">
-          <el-input v-model="viewForm.scoreId" disabled />
+        <el-form-item label="关联成绩单">
+          <el-input :value="getScoreName(viewForm.scoreId)" disabled />
         </el-form-item>
         <el-form-item label="课程信息">
           <el-input :value="getCourseInfo(viewForm.courseId)" disabled />
@@ -218,6 +236,7 @@
 import { listDetail, getDetail, delDetail, addDetail, updateDetail } from "@/api/score/detail"
 import download from '@/plugins/download'
 import { listCourse } from "@/api/course/course"
+import { listScore } from "@/api/score/score"
 
 export default {
   name: "Detail",
@@ -241,6 +260,10 @@ export default {
       courseList: [],
       // 课程信息映射
       courseMap: {},
+      // 成绩单列表
+      scoreList: [],
+      // 成绩单信息映射
+      scoreMap: {},
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -283,6 +306,7 @@ export default {
   created() {
     this.getList()
     this.getCourseList()
+    this.getScoreList()
   },
   computed: {
     /** 格式化后的文件大小 */
@@ -302,9 +326,41 @@ export default {
         })
       })
     },
+    /** 查询成绩单列表 */
+    getScoreList() {
+      listScore({ pageNum: 1, pageSize: 1000 }).then(response => {
+        this.scoreList = response.rows
+        // 构建成绩单信息映射
+        this.scoreMap = {}
+        response.rows.forEach(score => {
+          this.scoreMap[score.scoreId] = {
+            scoreName: score.scoreName,
+            courseId: score.courseId
+          }
+        })
+      })
+    },
+    /** 成绩单选择变更处理 */
+    handleScoreChange(scoreId) {
+      if (scoreId) {
+        const scoreInfo = this.scoreMap[scoreId]
+        if (scoreInfo) {
+          // 自动填充课程信息
+          this.form.courseId = scoreInfo.courseId
+        } else {
+          this.form.courseId = null
+        }
+      } else {
+        this.form.courseId = null
+      }
+    },
     /** 获取课程信息 */
     getCourseInfo(courseId) {
       return this.courseMap[courseId] || courseId
+    },
+    /** 获取成绩单名称 */
+    getScoreName(scoreId) {
+      return this.scoreMap[scoreId] ? this.scoreMap[scoreId].scoreName : scoreId
     },
     /** 下载文件 */
     handleDownload(row) {
