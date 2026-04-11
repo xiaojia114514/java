@@ -21,17 +21,73 @@ public class ZhipuAiFileParser {
     private static final Logger log = LoggerFactory.getLogger(ZhipuAiFileParser.class);
 
     /**
+     * 根据文件扩展名获取文件类型
+     * 
+     * @param filePath 文件路径
+     * @return 文件类型
+     * @throws Exception 异常信息
+     */
+    private static String getFileTypeByExtension(String filePath) throws Exception {
+        if (StringUtils.isEmpty(filePath)) {
+            throw new Exception("文件路径为空");
+        }
+        
+        // 获取文件扩展名
+        int lastDotIndex = filePath.lastIndexOf('.');
+        if (lastDotIndex == -1) {
+            throw new Exception("文件没有扩展名");
+        }
+        
+        String extension = filePath.substring(lastDotIndex + 1).toLowerCase();
+        
+        // 根据扩展名返回对应的文件类型
+        switch (extension) {
+            case "doc":
+            case "docx":
+                return extension;
+            case "xls":
+            case "xlsx":
+                return "xls";
+            case "pdf":
+                return "pdf";
+            case "txt":
+                return "txt";
+            case "md":
+                return "md";
+            case "csv":
+                return "csv";
+            case "ppt":
+            case "pptx":
+                return extension;
+            case "png":
+                return "png";
+            case "jpg":
+            case "jpeg":
+                return "jpg";
+            default:
+                throw new Exception("不支持的文件类型: " + extension);
+        }
+    }
+
+    /**
      * 解析文件
      * 
      * @param client 智谱AI客户端
      * @param filePath 文件路径
-     * @param fileType 文件类型
+     * @param fileType 文件类型（如果为null或空，则根据文件扩展名自动判断）
      * @param profile 上传文件路径
      * @return 解析内容
      * @throws Exception 异常信息
      */
     public static String parseFile(ZhipuAiClient client, String filePath, String fileType, String profile) throws Exception {
         log.info("开始解析文件: {}", filePath);
+        
+        // 根据文件扩展名自动判断文件类型（如果未指定）
+        if (StringUtils.isEmpty(fileType)) {
+            fileType = getFileTypeByExtension(filePath);
+            log.info("根据文件扩展名自动判断文件类型: {}", fileType);
+        }
+        
         // 构建完整的文件路径
         // 检查filePath是否已经包含profile前缀
         String fullPath;
@@ -59,9 +115,37 @@ public class ZhipuAiFileParser {
 
         log.info("创建解析任务...");
         FileParsingResponse response = client.fileParsing().createParseTask(uploadReq);
-        if (!response.isSuccess() || response.getData().getTaskId() == null) {
+        
+        // 记录完整的响应信息，便于调试
+        log.info("智谱AI响应 - isSuccess: {}, msg: {}, code: {}", 
+            response.isSuccess(), 
+            response.getMsg(), 
+            response.getCode());
+        
+        // 记录data字段的详细信息
+        if (response.getData() != null) {
+            log.info("智谱AI响应数据 - TaskId: {}, Message: {}", 
+                response.getData().getTaskId(), 
+                response.getData().getMessage());
+        } else {
+            log.warn("智谱AI响应数据为null");
+        }
+        
+        // 特殊处理"Call Successful"消息，即使isSuccess返回false也继续处理
+        boolean isCallSuccessful = "Call Successful".equals(response.getMsg());
+        if (isCallSuccessful) {
+            log.info("检测到'Call Successful'消息，特殊处理");
+        }
+        
+        // 检查解析任务是否创建成功
+        boolean hasValidTaskId = response.getData() != null && response.getData().getTaskId() != null;
+        if (!response.isSuccess() && !isCallSuccessful) {
             log.error("解析任务创建失败: {}", response.getMsg());
             throw new Exception("解析任务创建失败: " + response.getMsg());
+        }
+        if (!hasValidTaskId) {
+            log.error("解析任务创建失败：未获取到有效TaskId");
+            throw new Exception("解析任务创建失败：未获取到有效TaskId");
         }
         log.info("解析任务创建成功，TaskId: {}", response.getData().getTaskId());
 
@@ -112,7 +196,13 @@ public class ZhipuAiFileParser {
      * @throws Exception 异常信息
      */
     public static String parseExcelFile(ZhipuAiClient client, String filePath, String profile) throws Exception {
-        return parseFile(client, filePath, "xls", profile);
+        // 根据文件扩展名判断文件类型
+        String fileType = "xls";
+        if (filePath.toLowerCase().endsWith(".xlsx")) {
+            fileType = "xlsx";
+        }
+        log.info("解析Excel文件，文件类型: {}", fileType);
+        return parseFile(client, filePath, fileType, profile);
     }
 
     /**
@@ -125,6 +215,11 @@ public class ZhipuAiFileParser {
      * @throws Exception 异常信息
      */
     public static String parseWordFile(ZhipuAiClient client, String filePath, String profile) throws Exception {
-        return parseFile(client, filePath, "docx", profile);
+        // 根据文件扩展名判断文件类型
+        String fileType = "docx";
+        if (filePath.toLowerCase().endsWith(".doc")) {
+            fileType = "doc";
+        }
+        return parseFile(client, filePath, fileType, profile);
     }
 }

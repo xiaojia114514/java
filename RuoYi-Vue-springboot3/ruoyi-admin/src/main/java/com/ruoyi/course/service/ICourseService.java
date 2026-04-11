@@ -58,4 +58,14 @@ public interface ICourseService
      * @return 结果
      */
     public int deleteCourseByCourseId(Long courseId);
+
+    /**
+     * 生成教学质量分析报告
+     * 
+     * @param courseId 课程ID
+     * @param templateId 模板ID
+     * @return 报告生成结果
+     * @throws Exception 异常信息
+     */
+    public String generateQualityReport(Long courseId, Long templateId) throws Exception;
 }

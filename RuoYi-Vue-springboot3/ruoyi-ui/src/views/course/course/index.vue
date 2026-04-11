@@ -106,6 +106,17 @@
           v-hasPermi="['course:course:export']"
         >导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          plain
+          icon="el-icon-document"
+          size="mini"
+          :disabled="single"
+          @click="handleGenerateReport"
+          v-hasPermi="['course:course:add']"
+        >生成教学质量分析报告</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -237,11 +248,33 @@
         <el-button @click="viewOpen = false">关 闭</el-button>
       </div>
     </el-dialog>
+
+    <!-- 模板选择对话框 -->
+    <el-dialog title="选择报告模板" :visible.sync="templateOpen" width="500px" append-to-body>
+      <el-form ref="templateForm" :model="templateForm" :rules="templateRules" label-width="80px">
+        <el-form-item label="报告模板" prop="templateId">
+          <el-select v-model="templateForm.templateId" placeholder="请选择报告模板" style="width: 100%">
+            <el-option
+              v-for="template in templateList"
+              :key="template.reportTemplateId"
+              :label="template.reportTemplateName"
+              :value="template.reportTemplateId"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="templateOpen = false">取 消</el-button>
+        <el-button type="primary" @click="submitTemplateForm">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listCourse, getCourse, delCourse, addCourse, updateCourse } from "@/api/course/course"
+import { listTemplate } from "@/api/report/template"
+import request from '@/utils/request'
 
 export default {
   name: "Course",
@@ -261,14 +294,30 @@ export default {
       total: 0,
       // 课程管理表格数据
       courseList: [],
+      // 报告模板列表
+      templateList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
       // 是否显示查看弹出层
       viewOpen: false,
+      // 是否显示模板选择弹出层
+      templateOpen: false,
       // 查看表单参数
       viewForm: {},
+      // 模板选择表单参数
+      templateForm: {
+        templateId: null
+      },
+      // 模板选择表单校验
+      templateRules: {
+        templateId: [
+          { required: true, message: "请选择报告模板", trigger: "blur" }
+        ]
+      },
+      // 当前选中的课程
+      currentCourse: null,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -298,6 +347,7 @@ export default {
   },
   created() {
     this.getList()
+    this.getTemplateList()
   },
   methods: {
     /** 查询课程管理列表 */
@@ -407,6 +457,63 @@ export default {
       this.download('course/course/export', {
         ...this.queryParams
       }, `course_${new Date().getTime()}.xlsx`)
+    },
+    /** 获取报告模板列表 */
+    getTemplateList() {
+      listTemplate({ pageNum: 1, pageSize: 1000 }).then(response => {
+        this.templateList = response.rows
+      })
+    },
+    /** 生成教学质量分析报告按钮操作 */
+    handleGenerateReport() {
+      // 从选中的行中获取课程信息
+      const selectedCourse = this.courseList.find(course => course.courseId === this.ids[0])
+      if (selectedCourse) {
+        this.currentCourse = selectedCourse
+        this.templateForm.templateId = null
+        this.templateOpen = true
+      }
+    },
+    /** 提交模板选择表单 */
+    submitTemplateForm() {
+      this.$refs["templateForm"].validate(valid => {
+        if (valid) {
+          // 检查是否选择了课程
+          if (!this.currentCourse || !this.currentCourse.courseId) {
+            this.$modal.msgError('请先选择一个课程')
+            return
+          }
+          
+          // 显示生成中提示
+          this.$modal.confirm('报告生成过程可能需要等待几分钟时间。\n\n请耐心等待，不要关闭浏览器窗口。\n\n若多次异常请联系管理员。', '生成提示', {
+            confirmButtonText: '确定生成',
+            cancelButtonText: '取消',
+            type: 'info'
+          }).then(() => {
+            // 调用后端接口生成报告
+            request({
+              url: '/course/course/generateQualityReport',
+              method: 'post',
+              data: {
+                courseId: this.currentCourse.courseId,
+                templateId: this.templateForm.templateId
+              }
+            }).then(response => {
+              if (response.code === 200) {
+                this.$modal.msgSuccess(response.msg)
+              } else {
+                this.$modal.msgError(response.msg)
+              }
+              this.templateOpen = false
+            }).catch(error => {
+              this.$modal.msgError('生成失败：' + error.message)
+              this.templateOpen = false
+            })
+          }).catch(() => {
+            console.log('用户取消生成报告');
+          })
+        }
+      })
     }
   }
 }

@@ -101,4 +101,43 @@ public class CourseController extends BaseController
     {
         return toAjax(courseService.deleteCourseByCourseIds(courseIds));
     }
+
+    /**
+     * 生成教学质量分析报告
+     */
+    @PreAuthorize("@ss.hasPermi('course:course:add')")
+    @Log(title = "课程管理", businessType = BusinessType.OTHER)
+    @PostMapping("/generateQualityReport")
+    public AjaxResult generateQualityReport(@RequestBody QualityReportRequest request)
+    {
+        try {
+            return success(courseService.generateQualityReport(request.getCourseId(), request.getTemplateId()));
+        } catch (Exception e) {
+            return error(e.getMessage());
+        }
+    }
+
+    /**
+     * 质量报告请求参数
+     */
+    static class QualityReportRequest {
+        private Long courseId;
+        private Long templateId;
+
+        public Long getCourseId() {
+            return courseId;
+        }
+
+        public void setCourseId(Long courseId) {
+            this.courseId = courseId;
+        }
+
+        public Long getTemplateId() {
+            return templateId;
+        }
+
+        public void setTemplateId(Long templateId) {
+            this.templateId = templateId;
+        }
+    }
 }
