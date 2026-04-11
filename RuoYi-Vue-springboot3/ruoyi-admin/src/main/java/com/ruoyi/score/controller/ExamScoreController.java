@@ -35,6 +35,20 @@ public class ExamScoreController extends BaseController
     private IExamScoreService examScoreService;
 
     /**
+     * 生成成绩细目表
+     */
+    @PostMapping("/generateDetail")
+    public AjaxResult generateDetail(@RequestBody ExamScore examScore)
+    {
+        try {
+            String downloadUrl = examScoreService.generateDetail(examScore.getScoreId());
+            return AjaxResult.success("成绩细目表生成成功", downloadUrl);
+        } catch (Exception e) {
+            return error(e.getMessage());
+        }
+    }
+
+    /**
      * 查询考试成绩单列表
      */
     @PreAuthorize("@ss.hasPermi('score:score:list')")

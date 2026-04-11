@@ -58,4 +58,13 @@ public interface IExamScoreService
      * @return 结果
      */
     public int deleteExamScoreByScoreId(Long scoreId);
+
+    /**
+     * 生成成绩细目表
+     * 
+     * @param scoreId 考试成绩单主键
+     * @return 下载链接
+     * @throws Exception 异常信息
+     */
+    public String generateDetail(Long scoreId) throws Exception;
 }

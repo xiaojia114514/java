@@ -97,15 +97,15 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="是否解析" align="center" width="80">
+      <el-table-column label="是否解析" align="center" width="100">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.examScoreTaskId ? 'success' : 'warning'">
-            {{ scope.row.examScoreTaskId ? '已解析' : '未解析' }}
+          <el-tag :type="scope.row.parseContent ? 'success' : 'warning'">
+            {{ scope.row.parseContent ? '已解析' : '未解析' }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" width="120" show-overflow-tooltip />
-      <el-table-column label="操作" align="center" width="240" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -133,6 +133,12 @@
             icon="el-icon-download"
             @click="handleDownload(scope.row)"
           >下载</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            icon="el-icon-document"
+            @click="handleGenerateDetail(scope.row)"
+          >生成细目表</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -216,6 +222,7 @@
 import { listScore, getScore, delScore, addScore, updateScore } from "@/api/score/score"
 import download from '@/plugins/download'
 import { listCourse } from "@/api/course/course"
+import request from '@/utils/request'
 
 export default {
   name: "Score",
@@ -436,6 +443,37 @@ export default {
       this.download('score/score/export', {
         ...this.queryParams
       }, `score_${new Date().getTime()}.xlsx`)
+    },
+    /** 生成细目表操作 */
+    handleGenerateDetail(row) {
+      console.log('点击了生成细目表按钮', row);
+      // 显示生成中提示
+      this.$modal.confirm('细目表模板即将生成，期间可能需要等待几分钟时间才会创建下载任务。\n\n如果长时间没有出现下载任务或生成模板有误，可以稍后尝试。\n\n若多次异常请联系管理员。', '生成提示', {
+        confirmButtonText: '确定生成',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+        console.log('用户确认生成细目表');
+        request({ url: '/score/score/generateDetail', method: 'post', data: { scoreId: row.scoreId } })
+          .then(response => {
+            console.log('请求成功', response);
+            if (response.code === 200) {
+              this.$modal.msgSuccess('成绩细目表生成成功，正在下载...')
+              // 下载生成的文件，使用download插件
+              const url = response.data
+              console.log('下载链接', url);
+              download.resource(url)
+            } else {
+              this.$modal.msgError(response.msg)
+            }
+          })
+          .catch(error => {
+            console.error('请求失败', error);
+            this.$modal.msgError('生成失败：' + error.message)
+          })
+      }).catch(() => {
+        console.log('用户取消生成细目表');
+      })
     }
   }
 }

@@ -88,7 +88,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="是否解析" align="center" width="80">
+      <el-table-column label="是否解析" align="center" width="100">
         <template slot-scope="scope">
           <el-tag :type="scope.row.reportTemplateTaskId ? 'success' : 'warning'">
             {{ scope.row.reportTemplateTaskId ? '已解析' : '未解析' }}

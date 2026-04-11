@@ -97,10 +97,10 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="是否解析" align="center" width="80">
+      <el-table-column label="是否解析" align="center" width="100">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.syllabusTaskId ? 'success' : 'warning'">
-            {{ scope.row.syllabusTaskId ? '已解析' : '未解析' }}
+          <el-tag :type="scope.row.parseContent ? 'success' : 'warning'">
+            {{ scope.row.parseContent ? '已解析' : '未解析' }}
           </el-tag>
         </template>
       </el-table-column>

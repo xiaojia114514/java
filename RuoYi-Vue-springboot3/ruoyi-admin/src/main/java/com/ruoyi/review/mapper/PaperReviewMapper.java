@@ -58,4 +58,12 @@ public interface PaperReviewMapper
      * @return 结果
      */
     public int deletePaperReviewByReviewIds(Long[] reviewIds);
+
+    /**
+     * 根据课程ID查询试卷实质审查
+     * 
+     * @param courseId 课程ID
+     * @return 试卷实质审查
+     */
+    public PaperReview selectPaperReviewByCourseId(Long courseId);
 }

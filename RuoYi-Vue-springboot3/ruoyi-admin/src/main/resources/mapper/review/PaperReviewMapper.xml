@@ -45,6 +45,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where p.review_id = #{reviewId} and p.del_flag = '0'
     </select>
 
+    <select id="selectPaperReviewByCourseId" parameterType="Long" resultMap="PaperReviewResult">
+        <include refid="selectPaperReviewVo"/>
+        where p.course_id = #{courseId} and p.del_flag = '0'
+    </select>
+
     <insert id="insertPaperReview" parameterType="PaperReview" useGeneratedKeys="true" keyProperty="reviewId">
         insert into paper_review
         <trim prefix="(" suffix=")" suffixOverrides=",">
