@@ -78,7 +78,6 @@
         </template>
       </el-table-column>
       <el-table-column label="报告名称" align="center" prop="reportName" />
-      <el-table-column label="报告内容" align="center" prop="reportContent" />
       <el-table-column label="状态" align="center" width="80">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
@@ -166,7 +165,9 @@
           <el-input v-model="viewForm.reportName" disabled />
         </el-form-item>
         <el-form-item label="报告内容">
-          <el-input v-model="viewForm.reportContent" type="textarea" disabled />
+          <div class="markdown-container">
+            <markdown-viewer :value="viewForm.reportContent" />
+          </div>
         </el-form-item>
         <el-form-item label="状态">
           <el-input :value="viewForm.status === '0' ? '正常' : '停用'" disabled />
@@ -185,9 +186,13 @@
 <script>
 import { listReport, getReport, delReport, addReport, updateReport } from "@/api/report/report"
 import { listCourse } from "@/api/course/course"
+import MarkdownViewer from "@/components/MarkdownViewer"
 
 export default {
   name: "Report",
+  components: {
+    MarkdownViewer
+  },
   data() {
     return {
       // 遮罩层
@@ -365,3 +370,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.markdown-container {
+  min-height: 192px;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: #ffffff;
+}
+</style>
