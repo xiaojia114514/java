@@ -17,7 +17,7 @@ public class FileParserTest {
             // 示例1: 创建解析任务
             System.out.println("=== 文件解析任务创建示例 ===");
             // 测试文件路径
-            String filePath = "D:\\Github\\毕设\\java\\RuoYi-Vue-springboot3\\doc\\测试——成绩单.xls";
+            String filePath = "D:\\Github\\毕设\\java\\RuoYi-Vue-springboot3\\doc\\测试_成绩单.xls";
             String taskId = createFileParsingTaskExample(client, filePath, "xls", "lite");
 
             // 示例2: 获取解析结果

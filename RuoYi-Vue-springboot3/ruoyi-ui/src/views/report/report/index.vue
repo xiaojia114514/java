@@ -156,7 +156,7 @@
     </el-dialog>
 
     <!-- 查看课程教学质量分析报告详情对话框 -->
-    <el-dialog title="查看课程教学质量分析报告" :visible.sync="viewOpen" width="500px" append-to-body>
+    <el-dialog title="查看课程教学质量分析报告" :visible.sync="viewOpen" width="900px" append-to-body>
       <el-form ref="viewForm" :model="viewForm" label-width="80px">
         <el-form-item label="课程信息">
           <el-input :value="getCourseInfo(viewForm.courseId)" disabled />
@@ -373,12 +373,15 @@ export default {
 
 <style scoped>
 .markdown-container {
-  min-height: 192px;
-  max-height: 400px;
+  min-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
   border: 1px solid #e4e7ed;
   border-radius: 4px;
-  padding: 12px;
+  padding: 20px;
   background-color: #ffffff;
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 </style>
