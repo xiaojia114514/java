@@ -97,13 +97,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="是否解析" align="center" width="100">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.parseContent ? 'success' : 'warning'">
-            {{ scope.row.parseContent ? '已解析' : '未解析' }}
-          </el-tag>
-        </template>
-      </el-table-column>
+
       <el-table-column label="备注" align="center" prop="remark" width="120" show-overflow-tooltip />
       <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">

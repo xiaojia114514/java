@@ -13,7 +13,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="syllabusSize"    column="syllabus_size"    />
         <result property="parseContent"    column="parse_content"    />
         <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -22,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectSyllabusVo">
-        select s.syllabus_id, s.course_id, c.course_name, s.syllabus_name, s.syllabus_file, s.syllabus_size, s.parse_content, s.status, s.del_flag, s.create_by, s.create_time, s.update_by, s.update_time, s.remark 
+        select s.syllabus_id, s.course_id, c.course_name, s.syllabus_name, s.syllabus_file, s.syllabus_size, s.parse_content, s.status, s.create_by, s.create_time, s.update_by, s.update_time, s.remark 
         from syllabus s
         left join course c on s.course_id = c.course_id
     </sql>
@@ -30,7 +29,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectSyllabusList" parameterType="Syllabus" resultMap="SyllabusResult">
         <include refid="selectSyllabusVo"/>
         <where>  
-            s.del_flag = '0'
             <if test="courseId != null "> and s.course_id = #{courseId}</if>
             <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
             <if test="syllabusName != null  and syllabusName != ''"> and s.syllabus_name like concat('%', #{syllabusName}, '%')</if>
@@ -42,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectSyllabusBySyllabusId" parameterType="Long" resultMap="SyllabusResult">
         <include refid="selectSyllabusVo"/>
-        where s.syllabus_id = #{syllabusId} and s.del_flag = '0'
+        where s.syllabus_id = #{syllabusId}
     </select>
 
     <insert id="insertSyllabus" parameterType="Syllabus" useGeneratedKeys="true" keyProperty="syllabusId">
@@ -54,7 +52,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="syllabusSize != null">syllabus_size,</if>
             <if test="parseContent != null">parse_content,</if>
             <if test="status != null">status,</if>
-            <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -68,7 +65,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="syllabusSize != null">#{syllabusSize},</if>
             <if test="parseContent != null">#{parseContent},</if>
             <if test="status != null">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -86,7 +82,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="syllabusSize != null">syllabus_size = #{syllabusSize},</if>
             <if test="parseContent != null">parse_content = #{parseContent},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
@@ -96,14 +91,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where syllabus_id = #{syllabusId}
     </update>
 
-    <update id="deleteSyllabusBySyllabusId" parameterType="Long">
-        update syllabus set del_flag = '2' where syllabus_id = #{syllabusId}
-    </update>
+    <delete id="deleteSyllabusBySyllabusId" parameterType="Long">
+        delete from syllabus where syllabus_id = #{syllabusId}
+    </delete>
 
-    <update id="deleteSyllabusBySyllabusIds" parameterType="String">
-        update syllabus set del_flag = '2' where syllabus_id in 
+    <delete id="deleteSyllabusBySyllabusIds" parameterType="String">
+        delete from syllabus where syllabus_id in 
         <foreach item="syllabusId" collection="array" open="(" separator="," close=")">
             #{syllabusId}
         </foreach>
-    </update>
+    </delete>
 </mapper>

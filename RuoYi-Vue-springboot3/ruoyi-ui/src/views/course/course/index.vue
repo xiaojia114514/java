@@ -490,6 +490,9 @@ export default {
             cancelButtonText: '取消',
             type: 'info'
           }).then(() => {
+            // 选择模板后自动关闭模板选择窗口
+            this.templateOpen = false
+            
             // 调用后端接口生成报告
             request({
               url: '/course/course/generateQualityReport',
@@ -500,14 +503,18 @@ export default {
               }
             }).then(response => {
               if (response.code === 200) {
-                this.$modal.msgSuccess(response.msg)
+                // 报告生成完毕后弹出提示
+                this.$modal.msgSuccess('报告已生成，请到对应页面查看')
               } else {
                 this.$modal.msgError(response.msg)
               }
-              this.templateOpen = false
             }).catch(error => {
-              this.$modal.msgError('生成失败：' + error.message)
-              this.templateOpen = false
+              // 处理超时错误
+              if (error.message.includes('timeout')) {
+                this.$modal.msgError('ai调用超时')
+              } else {
+                this.$modal.msgError('生成失败：' + error.message)
+              }
             })
           }).catch(() => {
             console.log('用户取消生成报告');

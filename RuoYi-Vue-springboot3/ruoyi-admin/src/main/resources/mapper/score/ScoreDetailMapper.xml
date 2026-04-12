@@ -14,13 +14,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="detailSize"    column="detail_size"    />
         <result property="parseContent"    column="parse_content"    />
         <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectScoreDetailVo">
-        select s.score_detail_id, s.score_id, s.course_id, c.course_name, s.detail_name, s.detail_file, s.detail_size, s.parse_content, s.status, s.del_flag, s.create_time, s.update_time 
+        select s.score_detail_id, s.score_id, s.course_id, c.course_name, s.detail_name, s.detail_file, s.detail_size, s.parse_content, s.status, s.create_time, s.update_time 
         from score_detail s
         left join course c on s.course_id = c.course_id
     </sql>
@@ -28,7 +27,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectScoreDetailList" parameterType="ScoreDetail" resultMap="ScoreDetailResult">
         <include refid="selectScoreDetailVo"/>
         <where>  
-            s.del_flag = '0'
             <if test="scoreId != null "> and s.score_id = #{scoreId}</if>
             <if test="courseId != null "> and s.course_id = #{courseId}</if>
             <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
@@ -41,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectScoreDetailByScoreDetailId" parameterType="Long" resultMap="ScoreDetailResult">
         <include refid="selectScoreDetailVo"/>
-        where s.score_detail_id = #{scoreDetailId} and s.del_flag = '0'
+        where s.score_detail_id = #{scoreDetailId}
     </select>
 
     <insert id="insertScoreDetail" parameterType="ScoreDetail" useGeneratedKeys="true" keyProperty="scoreDetailId">
@@ -54,7 +52,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="detailSize != null">detail_size,</if>
             <if test="parseContent != null">parse_content,</if>
             <if test="status != null">status,</if>
-            <if test="delFlag != null">del_flag,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
          </trim>
@@ -66,7 +63,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="detailSize != null">#{detailSize},</if>
             <if test="parseContent != null">#{parseContent},</if>
             <if test="status != null">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
          </trim>
@@ -82,21 +78,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="detailSize != null">detail_size = #{detailSize},</if>
             <if test="parseContent != null">parse_content = #{parseContent},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </trim>
         where score_detail_id = #{scoreDetailId}
     </update>
 
-    <update id="deleteScoreDetailByScoreDetailId" parameterType="Long">
-        update score_detail set del_flag = '2' where score_detail_id = #{scoreDetailId}
-    </update>
+    <delete id="deleteScoreDetailByScoreDetailId" parameterType="Long">
+        delete from score_detail where score_detail_id = #{scoreDetailId}
+    </delete>
 
-    <update id="deleteScoreDetailByScoreDetailIds" parameterType="String">
-        update score_detail set del_flag = '2' where score_detail_id in 
+    <delete id="deleteScoreDetailByScoreDetailIds" parameterType="String">
+        delete from score_detail where score_detail_id in 
         <foreach item="scoreDetailId" collection="array" open="(" separator="," close=")">
             #{scoreDetailId}
         </foreach>
-    </update>
+    </delete>
 </mapper>

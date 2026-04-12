@@ -13,7 +13,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="reviewSize"    column="review_size"    />
         <result property="parseContent"    column="parse_content"    />
         <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -22,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectPaperReviewVo">
-        select p.review_id, p.course_id, c.course_name, p.review_name, p.review_file, p.review_size, p.parse_content, p.status, p.del_flag, p.create_by, p.create_time, p.update_by, p.update_time, p.remark 
+        select p.review_id, p.course_id, c.course_name, p.review_name, p.review_file, p.review_size, p.parse_content, p.status, p.create_by, p.create_time, p.update_by, p.update_time, p.remark 
         from paper_review p
         left join course c on p.course_id = c.course_id
     </sql>
@@ -30,7 +29,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectPaperReviewList" parameterType="PaperReview" resultMap="PaperReviewResult">
         <include refid="selectPaperReviewVo"/>
         <where>  
-            p.del_flag = '0'
             <if test="courseId != null "> and p.course_id = #{courseId}</if>
             <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
             <if test="reviewName != null  and reviewName != ''"> and p.review_name like concat('%', #{reviewName}, '%')</if>
@@ -42,12 +40,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectPaperReviewByReviewId" parameterType="Long" resultMap="PaperReviewResult">
         <include refid="selectPaperReviewVo"/>
-        where p.review_id = #{reviewId} and p.del_flag = '0'
+        where p.review_id = #{reviewId}
     </select>
 
     <select id="selectPaperReviewByCourseId" parameterType="Long" resultMap="PaperReviewResult">
         <include refid="selectPaperReviewVo"/>
-        where p.course_id = #{courseId} and p.del_flag = '0'
+        where p.course_id = #{courseId}
     </select>
 
     <insert id="insertPaperReview" parameterType="PaperReview" useGeneratedKeys="true" keyProperty="reviewId">
@@ -59,7 +57,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reviewSize != null">review_size,</if>
             <if test="parseContent != null">parse_content,</if>
             <if test="status != null">status,</if>
-            <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -73,7 +70,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reviewSize != null">#{reviewSize},</if>
             <if test="parseContent != null">#{parseContent},</if>
             <if test="status != null">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -91,7 +87,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="reviewSize != null">review_size = #{reviewSize},</if>
             <if test="parseContent != null">parse_content = #{parseContent},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
@@ -101,14 +96,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where review_id = #{reviewId}
     </update>
 
-    <update id="deletePaperReviewByReviewId" parameterType="Long">
-        update paper_review set del_flag = '2' where review_id = #{reviewId}
-    </update>
+    <delete id="deletePaperReviewByReviewId" parameterType="Long">
+        delete from paper_review where review_id = #{reviewId}
+    </delete>
 
-    <update id="deletePaperReviewByReviewIds" parameterType="String">
-        update paper_review set del_flag = '2' where review_id in 
+    <delete id="deletePaperReviewByReviewIds" parameterType="String">
+        delete from paper_review where review_id in 
         <foreach item="reviewId" collection="array" open="(" separator="," close=")">
             #{reviewId}
         </foreach>
-    </update>
+    </delete>
 </mapper>

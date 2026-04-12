@@ -290,8 +290,7 @@ public class CourseServiceImpl implements ICourseService
                 "2. 报告结构清晰，内容完整\n" +
                 "3. 基于提供的数据进行分析，确保数据准确性\n" +
                 "4. 按照模板的结构和要求生成报告\n" +
-                "5. 报告名称为：" + courseName + "-课程目标达成情况分析报告\n" +
-                "6. 只返回Markdown格式的报告内容，不要包含其他文字\n";
+                "5. 只返回Markdown格式的报告内容，不要包含其他文字\n";
 
         // 创建聊天请求
         ChatCompletionCreateParams request = ChatCompletionCreateParams.builder()

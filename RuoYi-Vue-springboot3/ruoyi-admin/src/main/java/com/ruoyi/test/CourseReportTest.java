@@ -5,12 +5,17 @@ import ai.z.openapi.service.model.ChatCompletionCreateParams;
 import ai.z.openapi.service.model.ChatCompletionResponse;
 import ai.z.openapi.service.model.ChatMessage;
 import ai.z.openapi.service.model.ChatMessageRole;
+import java.util.concurrent.TimeUnit;
+
+;
 
 public class CourseReportTest {
     public static void main(String[] args) {
         // 创建客户端
         ZhipuAiClient client = ZhipuAiClient.builder().ofZHIPU()
                 .apiKey("78113699b99c4beb92a4c2844f59803a.El8by0GXUkXTG0Rm")
+                .enableTokenCache()
+                .networkConfig(300, 60, 60, 60,TimeUnit.SECONDS)
                 .build();
         try {
             // 测试生成课程目标达成情况分析报告

@@ -15,7 +15,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="semester"    column="semester"    />
         <result property="className"    column="class_name"    />
         <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -24,13 +23,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCourseVo">
-        select course_id, course_code, course_name, course_english_name, course_nature, total_hours, credit, semester, class_name, status, del_flag, create_by, create_time, update_by, update_time, remark from course
+        select course_id, course_code, course_name, course_english_name, course_nature, total_hours, credit, semester, class_name, status, create_by, create_time, update_by, update_time, remark from course
     </sql>
 
     <select id="selectCourseList" parameterType="Course" resultMap="CourseResult">
         <include refid="selectCourseVo"/>
         <where>  
-            del_flag = '0'
             <if test="courseCode != null  and courseCode != ''"> and course_code like concat('%', #{courseCode}, '%')</if>
             <if test="courseName != null  and courseName != ''"> and course_name like concat('%', #{courseName}, '%')</if>
             <if test="courseEnglishName != null  and courseEnglishName != ''"> and course_english_name like concat('%', #{courseEnglishName}, '%')</if>
@@ -45,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectCourseByCourseId" parameterType="Long" resultMap="CourseResult">
         <include refid="selectCourseVo"/>
-        where course_id = #{courseId} and del_flag = '0'
+        where course_id = #{courseId}
     </select>
 
     <insert id="insertCourse" parameterType="Course" useGeneratedKeys="true" keyProperty="courseId">
@@ -60,7 +58,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="semester != null">semester,</if>
             <if test="className != null">class_name,</if>
             <if test="status != null">status,</if>
-            <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -77,7 +74,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="semester != null">#{semester},</if>
             <if test="className != null">#{className},</if>
             <if test="status != null">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -98,7 +94,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="semester != null">semester = #{semester},</if>
             <if test="className != null">class_name = #{className},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
@@ -108,14 +103,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where course_id = #{courseId}
     </update>
 
-    <update id="deleteCourseByCourseId" parameterType="Long">
-        update course set del_flag = '2' where course_id = #{courseId}
-    </update>
+    <delete id="deleteCourseByCourseId" parameterType="Long">
+        delete from course where course_id = #{courseId}
+    </delete>
 
-    <update id="deleteCourseByCourseIds" parameterType="String">
-        update course set del_flag = '2' where course_id in 
+    <delete id="deleteCourseByCourseIds" parameterType="String">
+        delete from course where course_id in 
         <foreach item="courseId" collection="array" open="(" separator="," close=")">
             #{courseId}
         </foreach>
-    </update>
+    </delete>
 </mapper>
